@@ -203,6 +203,33 @@ let package = Package(
         // variant TYPE module, exercising its hot-op surface in isolation; cross-variant
         // + conformance tests live in the umbrella test target below)
         .testTarget(
+            name: "Set Ordered Primitive Tests",
+            dependencies: [
+                "Set Ordered Primitive",
+                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
+                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
+            ]
+        ),
+
+        .testTarget(
+            name: "Set Ordered Fixed Primitive Tests",
+            dependencies: [
+                "Set Ordered Fixed Primitive",
+                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
+                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
+            ]
+        ),
+
+        .testTarget(
+            name: "Set Ordered Static Primitive Tests",
+            dependencies: [
+                "Set Ordered Static Primitive",
+                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
+                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
+            ]
+        ),
+
+        .testTarget(
             name: "Set Ordered Small Primitive Tests",
             dependencies: [
                 "Set Ordered Small Primitive",
