@@ -33,6 +33,7 @@ let package = Package(
         .package(path: "../swift-buffer-primitives"),
         .package(path: "../swift-buffer-linear-primitives"),
         .package(path: "../swift-sequence-primitives"),
+        .package(path: "../swift-iterator-primitives"),
         .package(path: "../swift-property-primitives"),
         .package(path: "../swift-ordinal-primitives"),
         .package(path: "../swift-cardinal-primitives"),
@@ -75,6 +76,7 @@ let package = Package(
                 .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
                 .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
+                .product(name: "Iterator Primitives", package: "swift-iterator-primitives"),
                 .product(name: "Property Primitives", package: "swift-property-primitives"),
                 .product(name: "Finite Primitives", package: "swift-finite-primitives"),
             ]
