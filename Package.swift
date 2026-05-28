@@ -36,6 +36,7 @@ let package = Package(
         .package(path: "../swift-bit-primitives"),
         .package(path: "../swift-index-primitives"),
         .package(path: "../swift-hash-table-primitives"),
+        .package(path: "../swift-hash-primitives"),
         .package(path: "../swift-buffer-primitives"),
         .package(path: "../swift-buffer-linear-primitives"),
         .package(path: "../swift-sequence-primitives"),
@@ -198,7 +199,19 @@ let package = Package(
             path: "Tests/Support"
         ),
 
-        // MARK: - Tests
+        // MARK: - Per-variant type tests ([TEST-033] topology B: one test target per
+        // variant TYPE module, exercising its hot-op surface in isolation; cross-variant
+        // + conformance tests live in the umbrella test target below)
+        .testTarget(
+            name: "Set Ordered Small Primitive Tests",
+            dependencies: [
+                "Set Ordered Small Primitive",
+                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
+                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
+            ]
+        ),
+
+        // MARK: - Umbrella + cross-variant tests
         .testTarget(
             name: "Set Ordered Primitives Tests",
             dependencies: [

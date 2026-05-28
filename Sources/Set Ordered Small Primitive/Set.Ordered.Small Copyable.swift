@@ -135,14 +135,9 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
 // MARK: - Element Access (Copyable)
 
 extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
-    /// Accesses the element at the specified index, returning nil if out of bounds.
-    @inlinable
-    public func element(at index: Index<Element>) -> Element? {
-        guard index < count else { return nil }
-        return buffer[index]
-    }
-
     /// Accesses the element at the specified index, with typed error on bounds failure.
+    ///
+    /// For an optional result, use `try? set.element(at: index)`.
     @inlinable
     public func element(at index: Index<Element>) throws(__SetOrderedError<Element>) -> Element {
         guard index < count else {
