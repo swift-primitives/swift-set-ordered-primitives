@@ -11,18 +11,18 @@
 
 internal import Property_Primitives
 import Sequence_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 
 // MARK: - Sequence.Drain.Protocol Conformance
 
-extension Set_Primitives_Core.Set.Ordered.Small: Sequence.Drain.`Protocol` {
+extension Set_Primitives.Set.Ordered.Small: Sequence.Drain.`Protocol` {
     // drain(_ body:) method already exists in Set.Ordered.Small.swift
 }
 
 // MARK: - Property Accessor
 
-extension Set_Primitives_Core.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small {
     /// Property accessor for `.drain { }` syntax.
     ///
     /// Draining removes all elements from the set, passing each to the closure.

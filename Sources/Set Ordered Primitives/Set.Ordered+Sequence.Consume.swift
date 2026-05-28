@@ -11,7 +11,7 @@
 
 import Index_Primitives
 import Sequence_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
@@ -26,7 +26,7 @@ public import Buffer_Linear_Primitives
 // After swap, mutableSelf.buffer is empty (destruction harmless).
 // consumeBuffer has all elements with unique storage.
 
-extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
+extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// Returns a consuming view: `.consume().forEach { }`
     ///
     /// The view takes ownership of the set's elements and provides

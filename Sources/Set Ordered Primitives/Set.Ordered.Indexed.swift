@@ -12,13 +12,13 @@
 import Cardinal_Primitives
 import Index_Primitives
 import Ordinal_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 
 // MARK: - Set.Ordered.Indexed
 
-extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
+extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// A wrapper providing phantom-typed index access to ordered set storage.
     ///
     /// `Indexed<Tag>` wraps a `Set<Element>.Ordered` and provides subscript
@@ -63,13 +63,13 @@ extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
     // TRACKING: unsafe-audit-findings.md Category D SP-4.
     public struct Indexed<Tag: Copyable>: Copyable, @unchecked Sendable {
         @usableFromInline
-        var _storage: Set_Primitives_Core.Set<Element>.Ordered
+        var _storage: Set_Primitives.Set<Element>.Ordered
 
         /// Creates an indexed wrapper around the given storage.
         ///
         /// - Parameter storage: The ordered set to wrap.
         @inlinable
-        public init(_ storage: consuming Set_Primitives_Core.Set<Element>.Ordered) {
+        public init(_ storage: consuming Set_Primitives.Set<Element>.Ordered) {
             self._storage = storage
         }
 
@@ -101,7 +101,7 @@ extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
 
 // MARK: - Passthrough Properties
 
-extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// Whether the set is empty.
     @inlinable
     public var isEmpty: Bool { _storage.isEmpty }
@@ -115,7 +115,7 @@ extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
 
 // MARK: - Membership Operations
 
-extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// Returns whether the set contains the given element.
     @inlinable
     public func contains(_ element: Element) -> Bool {
@@ -132,7 +132,7 @@ extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
 
 // MARK: - Mutating Operations
 
-extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// Inserts an element into the set.
     ///
     /// - Parameter element: The element to insert.
@@ -165,7 +165,7 @@ extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
 
 // MARK: - First/Last Accessors
 
-extension Set_Primitives_Core.Set.Ordered.Indexed where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// The first element, or `nil` if the set is empty.
     @inlinable
     public var first: Element? { _storage.first }

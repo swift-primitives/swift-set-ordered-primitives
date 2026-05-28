@@ -12,7 +12,7 @@
 import Cardinal_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
@@ -20,7 +20,7 @@ public import Buffer_Linear_Small_Primitive
 
 // Note: Set.Ordered.Small is unconditionally ~Copyable (inline storage requires deinit),
 // so it cannot conform to Swift.Sequence which requires Copyable.
-// It conforms to Sequence.Protocol which supports ~Copyable containers.
+// It conforms to Sequenceable which supports ~Copyable containers.
 
 // ============================================================================
 // MARK: - Iterator
@@ -56,10 +56,10 @@ extension Set.Ordered.Small where Element: Copyable {
 extension Set.Ordered.Small.Iterator: Sendable where Element: Sendable {}
 
 // ============================================================================
-// MARK: - Sequence.Protocol Conformance
+// MARK: - Sequenceable Conformance
 // ============================================================================
 
-extension Set.Ordered.Small: Sequence.`Protocol` where Element: Copyable {
+extension Set.Ordered.Small: Sequenceable where Element: Copyable {
     /// Returns an iterator over the set elements.
     ///
     /// Copies elements to a `Buffer.Linear` snapshot for safe iteration,

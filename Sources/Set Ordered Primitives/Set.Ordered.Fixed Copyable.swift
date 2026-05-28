@@ -12,7 +12,7 @@
 import Cardinal_Primitives
 import Index_Primitives
 internal import Ordinal_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Bounded_Primitive
 public import Buffer_Linear_Bounded_Primitives
@@ -63,10 +63,10 @@ extension Set.Ordered.Fixed: Swift.Sequence where Element: Copyable {
 }
 
 // ============================================================================
-// MARK: - Sequence.Protocol Conformance
+// MARK: - Sequenceable Conformance
 // ============================================================================
 
-extension Set.Ordered.Fixed: Sequence.`Protocol` where Element: Copyable {
+extension Set.Ordered.Fixed: Sequenceable where Element: Copyable {
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable
     public var underestimatedCount: Int { Int(bitPattern: count) }

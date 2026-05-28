@@ -10,11 +10,11 @@
 // ===----------------------------------------------------------------------===//
 
 import Index_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 
-extension Set_Primitives_Core.Set.Ordered.Algebra {
+extension Set_Primitives.Set.Ordered.Algebra {
     /// Namespace for symmetric set operations.
     ///
     /// Note: This stores the Buffer.Linear (a CoW value type) rather than
@@ -39,7 +39,7 @@ extension Set_Primitives_Core.Set.Ordered.Algebra {
 
 // MARK: - Symmetric Operations
 
-extension Set_Primitives_Core.Set.Ordered.Algebra.Symmetric {
+extension Set_Primitives.Set.Ordered.Algebra.Symmetric {
     /// Returns a new set with elements in either set, but not both.
     ///
     /// Elements from `self` come first in their original order,
@@ -49,8 +49,8 @@ extension Set_Primitives_Core.Set.Ordered.Algebra.Symmetric {
     /// - Returns: A new set with elements in exactly one of the sets.
     /// - Complexity: O(n + m) where n and m are the sizes of the sets.
     @inlinable
-    public func difference(_ other: borrowing Set_Primitives_Core.Set<Element>.Ordered) -> Set_Primitives_Core.Set<Element>.Ordered {
-        var result = Set_Primitives_Core.Set<Element>.Ordered()
+    public func difference(_ other: borrowing Set_Primitives.Set<Element>.Ordered) -> Set_Primitives.Set<Element>.Ordered {
+        var result = Set_Primitives.Set<Element>.Ordered()
 
         // Elements in self but not in other
         var index: Index<Element> = .zero

@@ -11,7 +11,7 @@
 
 import Finite_Primitives
 import Index_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Inline_Primitives
 public import Buffer_Linear_Primitive
@@ -32,7 +32,7 @@ public import Buffer_Linear_Primitive
 
 // MARK: - Properties
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// The number of elements in the set.
     @inlinable
     public var count: Index<Element>.Count { _buffer.count }
@@ -48,7 +48,7 @@ extension Set_Primitives_Core.Set.Ordered.Static {
 
 // MARK: - Core Operations
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// Returns the bounded index of the given element, or `nil` if not present.
     ///
     /// The returned index is guaranteed to be in [0, capacity).
@@ -148,7 +148,7 @@ extension Set_Primitives_Core.Set.Ordered.Static {
 
 // MARK: - Element Access
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// Accesses the element at the specified index.
     @inlinable
     public func element(at index: Index<Element>) throws(__SetOrderedInlineError<Element>) -> Element {
@@ -193,7 +193,7 @@ extension Set_Primitives_Core.Set.Ordered.Static {
 
 // MARK: - First/Last Accessors
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// The first element, or `nil` if the set is empty.
     @inlinable
     public var first: Element? {
@@ -211,7 +211,7 @@ extension Set_Primitives_Core.Set.Ordered.Static {
 
 // MARK: - Borrowed Element Access
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// Accesses the element at the given index via closure.
     @inlinable
     public func withElement<R>(at index: Index<Element>, _ body: (borrowing Element) -> R) -> R {

@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 
 extension Set.Ordered.Static where Element: Copyable {

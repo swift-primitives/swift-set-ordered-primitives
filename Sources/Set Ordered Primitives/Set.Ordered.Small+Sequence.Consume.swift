@@ -11,7 +11,7 @@
 
 import Index_Primitives
 import Sequence_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Small_Primitive
@@ -22,7 +22,7 @@ public import Buffer_Linear_Small_Primitives
 // Set.Ordered.Small delegates consuming iteration to Buffer.Linear.Small.
 // The composed buffer handles both inline and heap paths internally.
 
-extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Returns a consuming view: `.consume().forEach { }`
     ///
     /// Delegates to `Buffer<Element>.Linear.Small.consume()` which handles

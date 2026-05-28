@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitives_Core
+public import Set_Primitives
 import Index_Primitives
 
 // ===----------------------------------------------------------------------===//
@@ -155,17 +155,17 @@ extension __SetOrderedInlineError: CustomStringConvertible {
 
 // MARK: - Error Typealiases
 
-extension Set_Primitives_Core.Set.Ordered {
+extension Set_Primitives.Set.Ordered {
     /// Errors that can occur during ordered set operations.
     public typealias Error = __SetOrderedError<Element>
 }
 
-extension Set_Primitives_Core.Set.Ordered.Fixed {
+extension Set_Primitives.Set.Ordered.Fixed {
     /// Errors that can occur during Fixed ordered set operations.
     public typealias Error = __SetOrderedFixedError<Element>
 }
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// Errors that can occur during inline ordered set operations.
     public typealias Error = __SetOrderedInlineError<Element>
 }

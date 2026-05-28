@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
 public import Buffer_Linear_Bounded_Primitive
@@ -17,7 +17,7 @@ public import Buffer_Linear_Bounded_Primitives
 public import Hash_Table_Primitives
 import Index_Primitives
 
-extension Set where Element: ~Copyable {
+extension Set where Element: Hash.`Protocol` & ~Copyable {
 
     // MARK: - Ordered (Dynamically-Growing, Heap-Allocated)
 

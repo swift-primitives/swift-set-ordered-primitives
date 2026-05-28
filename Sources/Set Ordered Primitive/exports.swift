@@ -3,7 +3,7 @@
 // Re-exports the Set namespace shell plus the backings the ordered-set
 // type surface composes (buffer-linear element storage + hash-table lookup).
 
-@_exported public import Set_Primitives_Core
+@_exported public import Set_Primitives
 @_exported public import Buffer_Linear_Primitive
 @_exported public import Buffer_Linear_Primitives
 @_exported public import Buffer_Linear_Bounded_Primitive

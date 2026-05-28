@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Inline_Primitives
 import Hash_Table_Primitives

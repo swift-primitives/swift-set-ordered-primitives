@@ -10,7 +10,7 @@
 // ===----------------------------------------------------------------------===//
 
 import Sequence_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Inline_Primitives
 public import Buffer_Linear_Primitive
@@ -22,7 +22,7 @@ public import Buffer_Linear_Primitive
 // leaving the buffer empty so the set's deinit (which calls _buffer.removeAll())
 // is harmless.
 
-extension Set_Primitives_Core.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static {
     /// Returns a consuming view: `.consume().forEach { }`
     ///
     /// ```swift

@@ -45,7 +45,7 @@ let package = Package(
         .target(
             name: "Set Ordered Primitive",
             dependencies: [
-                .product(name: "Set Primitives Core", package: "swift-set-primitives"),
+                .product(name: "Set Primitives", package: "swift-set-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
@@ -63,7 +63,7 @@ let package = Package(
             name: "Set Ordered Primitives",
             dependencies: [
                 "Set Ordered Primitive",
-                .product(name: "Set Primitives Core", package: "swift-set-primitives"),
+                .product(name: "Set Primitives", package: "swift-set-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),

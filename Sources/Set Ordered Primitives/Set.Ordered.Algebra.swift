@@ -10,13 +10,13 @@
 // ===----------------------------------------------------------------------===//
 
 import Index_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 
 // MARK: - Algebra Accessor
 
-extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
+extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// Nested accessor for set algebra operations.
     ///
     /// ```swift
@@ -33,7 +33,7 @@ extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
 
 // MARK: - Algebra Type
 
-extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
+extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// Namespace for set algebra operations.
     ///
     /// Algebra operations require `Element: Copyable` since they create new sets
@@ -61,7 +61,7 @@ extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
 
 // MARK: - Algebra Operations
 
-extension Set_Primitives_Core.Set.Ordered.Algebra {
+extension Set_Primitives.Set.Ordered.Algebra {
     /// Returns a new set with elements from both sets.
     ///
     /// Elements from `self` come first in their original order,
@@ -71,8 +71,8 @@ extension Set_Primitives_Core.Set.Ordered.Algebra {
     /// - Returns: A new set containing all elements from both sets.
     /// - Complexity: O(n + m) where n and m are the sizes of the sets.
     @inlinable
-    public func union(_ other: borrowing Set_Primitives_Core.Set<Element>.Ordered) -> Set_Primitives_Core.Set<Element>.Ordered {
-        var result = Set_Primitives_Core.Set<Element>.Ordered()
+    public func union(_ other: borrowing Set_Primitives.Set<Element>.Ordered) -> Set_Primitives.Set<Element>.Ordered {
+        var result = Set_Primitives.Set<Element>.Ordered()
         // Add elements from self
         var index: Index<Element> = .zero
         let end = count.map(Ordinal.init)
@@ -98,8 +98,8 @@ extension Set_Primitives_Core.Set.Ordered.Algebra {
     /// - Returns: A new set containing only elements present in both sets.
     /// - Complexity: O(n) where n is the size of `self`.
     @inlinable
-    public func intersection(_ other: borrowing Set_Primitives_Core.Set<Element>.Ordered) -> Set_Primitives_Core.Set<Element>.Ordered {
-        var result = Set_Primitives_Core.Set<Element>.Ordered()
+    public func intersection(_ other: borrowing Set_Primitives.Set<Element>.Ordered) -> Set_Primitives.Set<Element>.Ordered {
+        var result = Set_Primitives.Set<Element>.Ordered()
         var index: Index<Element> = .zero
         let end = count.map(Ordinal.init)
         while index < end {
@@ -120,8 +120,8 @@ extension Set_Primitives_Core.Set.Ordered.Algebra {
     /// - Returns: A new set with elements not in `other`.
     /// - Complexity: O(n) where n is the size of `self`.
     @inlinable
-    public func subtract(_ other: borrowing Set_Primitives_Core.Set<Element>.Ordered) -> Set_Primitives_Core.Set<Element>.Ordered {
-        var result = Set_Primitives_Core.Set<Element>.Ordered()
+    public func subtract(_ other: borrowing Set_Primitives.Set<Element>.Ordered) -> Set_Primitives.Set<Element>.Ordered {
+        var result = Set_Primitives.Set<Element>.Ordered()
         var index: Index<Element> = .zero
         let end = count.map(Ordinal.init)
         while index < end {
@@ -143,12 +143,12 @@ extension Set_Primitives_Core.Set.Ordered.Algebra {
 
 // MARK: - Mutating Algebra Operations
 
-extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
+extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// Applies an algebra operation and replaces self with the result.
     ///
     /// - Parameter operation: A closure that takes the algebra accessor and returns a new set.
     @inlinable
-    public mutating func form(_ operation: (Algebra) -> Set_Primitives_Core.Set<Element>.Ordered) {
+    public mutating func form(_ operation: (Algebra) -> Set_Primitives.Set<Element>.Ordered) {
         self = operation(algebra)
     }
 }

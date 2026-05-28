@@ -12,14 +12,14 @@
 import Cardinal_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
 
 // Note: Set.Ordered.Static is unconditionally ~Copyable (inline storage requires deinit),
 // so it cannot conform to Swift.Sequence which requires Copyable.
-// It conforms to Sequence.Protocol which supports ~Copyable containers.
+// It conforms to Sequenceable which supports ~Copyable containers.
 
 // ============================================================================
 // MARK: - Iterator
@@ -55,10 +55,10 @@ extension Set.Ordered.Static where Element: Copyable {
 extension Set.Ordered.Static.Iterator: Sendable where Element: Sendable {}
 
 // ============================================================================
-// MARK: - Sequence.Protocol Conformance
+// MARK: - Sequenceable Conformance
 // ============================================================================
 
-extension Set.Ordered.Static: Sequence.`Protocol` where Element: Copyable {
+extension Set.Ordered.Static: Sequenceable where Element: Copyable {
     /// Returns an iterator over the set elements.
     ///
     /// Copies elements to a `Buffer.Linear` snapshot for safe iteration,

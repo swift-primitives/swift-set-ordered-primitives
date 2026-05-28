@@ -11,7 +11,7 @@
 
 import Index_Primitives
 import Sequence_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Bounded_Primitive
 public import Buffer_Linear_Bounded_Primitives
@@ -22,7 +22,7 @@ public import Buffer_Linear_Primitive
 // Set.Ordered.Fixed delegates consuming iteration entirely to Buffer.Linear.Bounded.
 // Same swap pattern as Set.Ordered — buffer owns the full pipeline.
 
-extension Set_Primitives_Core.Set.Ordered.Fixed where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
     /// Returns a consuming view: `.consume().forEach { }`
     ///
     /// ```swift

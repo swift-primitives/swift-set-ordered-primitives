@@ -23,7 +23,7 @@
 // Module placement: Set Ordered Primitives (not Set Primitives Core) because
 // these defaults construct Set.Ordered instances and call insert.
 
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 
 extension Set.`Protocol` where Self: ~Copyable, Element: Copyable {

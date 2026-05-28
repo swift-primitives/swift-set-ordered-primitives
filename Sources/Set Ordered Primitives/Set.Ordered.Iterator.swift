@@ -12,7 +12,7 @@
 import Cardinal_Primitives
 import Index_Primitives
 internal import Ordinal_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
@@ -23,7 +23,7 @@ public import Buffer_Linear_Primitives
 // for-in loops, map, filter, and other sequence operations.
 // For ~Copyable elements, use forEach() or index-based iteration instead.
 
-extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
+extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// Iterator for Set.Ordered that delegates to Buffer.Linear.Iterator.
     public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
@@ -56,7 +56,7 @@ extension Set_Primitives_Core.Set.Ordered where Element: Copyable {
     }
 }
 
-extension Set_Primitives_Core.Set.Ordered.Iterator: Sendable where Element: Sendable {}
+extension Set_Primitives.Set.Ordered.Iterator: Sendable where Element: Sendable {}
 
 // MARK: - Conditional Sequence
 
@@ -64,7 +64,7 @@ extension Set_Primitives_Core.Set.Ordered.Iterator: Sendable where Element: Send
 ///
 /// This enables `for-in` loops, `map`, `filter`, and other sequence operations.
 /// For iteration without Copyable, use ``forEach(_:)`` instead.
-extension Set_Primitives_Core.Set.Ordered: Swift.Sequence where Element: Copyable {
+extension Set_Primitives.Set.Ordered: Swift.Sequence where Element: Copyable {
     // Note: Iterator is already defined below in the Iterator section.
     // Sequence conformance uses the existing makeIterator() method.
 }

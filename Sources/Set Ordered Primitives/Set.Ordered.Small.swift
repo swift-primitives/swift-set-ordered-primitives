@@ -12,7 +12,7 @@
 public import Cardinal_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
-public import Set_Primitives_Core
+public import Set_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Small_Primitive
 public import Buffer_Linear_Small_Primitives
@@ -33,7 +33,7 @@ public import Buffer_Linear_Small_Primitives
 // MARK: - Properties
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small {
     /// The number of elements in the set.
     @inlinable
     public var count: Index<Element>.Count {
@@ -55,7 +55,7 @@ extension Set_Primitives_Core.Set.Ordered.Small {
 // MARK: - Core Operations (Copyable elements)
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Returns the index of the given element, or `nil` if not present.
     @inlinable
     public func index(_ element: Element) -> Index<Element>? {
@@ -155,7 +155,7 @@ extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
 // MARK: - Build Hash Table
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Builds a hash table over all elements after spill.
     @usableFromInline
     mutating func _buildHashTable() {
@@ -174,7 +174,7 @@ extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
 // MARK: - Element Access (Copyable)
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Accesses the element at the specified index, returning nil if out of bounds.
     @inlinable
     public func element(at index: Index<Element>) -> Element? {
@@ -203,7 +203,7 @@ extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
 // MARK: - First/Last Accessors (Copyable)
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// The first element, or `nil` if the set is empty.
     @inlinable
     public var first: Element? {
@@ -224,7 +224,7 @@ extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
 // MARK: - Borrowed Element Access
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small {
     /// Accesses the element at the given index via closure.
     @inlinable
     public func withElement<R>(at index: Index<Element>, _ body: (borrowing Element) -> R) -> R {
@@ -304,7 +304,7 @@ extension Set_Primitives_Core.Set.Ordered.Small {
 // MARK: - Span Access (Closure-Based)
 // ============================================================================
 
-extension Set_Primitives_Core.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small {
     /// Safe, bounds-checked read access to contiguous storage via closure.
     ///
     /// Small sets use closure-based access because inline storage mode requires
@@ -335,7 +335,7 @@ extension Set_Primitives_Core.Set.Ordered.Small {
 // ============================================================================
 
 @_spi(Unsafe)
-extension Set_Primitives_Core.Set.Ordered.Small where Element: Copyable {
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Provides read-only access to the underlying contiguous storage.
     ///
     /// - Warning: Prefer ``withSpan(_:)`` for safe access.
