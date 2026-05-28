@@ -27,6 +27,10 @@ extension Set.Ordered where Element: ~Copyable {
     ///
     /// Inline mode uses O(n) linear scan — no hash table overhead for small sizes.
     /// Hash table activates only on spill.
+    // @frozen lifts the non-frozen partial-consume restriction so the consuming
+    // `Sequenceable.makeIterator()` can extract `_buffer`. ABI-freeze is fine
+    // pre-1.0 (principal-approved).
+    @frozen
     public struct Small<let inlineCapacity: Int>: ~Copyable {
         /// Element cleanup is handled by Storage.Inline's deinit (inline path) or Storage.Heap's deinit (spilled path).
 

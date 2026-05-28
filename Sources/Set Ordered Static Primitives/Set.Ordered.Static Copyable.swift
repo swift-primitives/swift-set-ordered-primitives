@@ -9,6 +9,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Iterator_Chunk_Primitives
+public import Iterable
+public import Sequence_Primitives
+public import Buffer_Linear_Inline_Primitives
+public import Memory_Contiguous_Primitives
+public import Memory_Iterator_Primitives
+
 import Cardinal_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
@@ -22,61 +29,49 @@ public import Buffer_Linear_Primitives
 // It conforms to Sequenceable which supports ~Copyable containers.
 
 // ============================================================================
-// MARK: - Iterator
+// MARK: - Iterable + Sequenceable (Copyable elements only)
 // ============================================================================
+//
+// Re-uses Iterator.Chunk (multipass, borrowing, over the inline buffer span) +
+// Buffer.Linear.Inline.Scalar (single-pass, consuming), mirroring buffer-linear's
+// Inline variant. The borrowing Iterable iterator is tied to `self` via
+// `@_lifetime(borrow self)`, so no snapshot copy is needed. No Swift.Sequence
+// (Static is unconditionally ~Copyable).
 
-extension Set.Ordered.Static where Element: Copyable {
-    /// Iterator for Set.Ordered.Static elements.
-    ///
-    /// Delegates to `Buffer.Linear.Iterator` over a snapshot for safe iteration,
-    /// avoiding pointer escape issues with inline storage.
-    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
-        @usableFromInline
-        var _inner: Buffer<Element>.Linear.Iterator
-
-        @usableFromInline
-        init(_inner: Buffer<Element>.Linear.Iterator) {
-            self._inner = _inner
-        }
-
-        @_lifetime(&self)
+// Memory.Contiguous.Protocol exposes the inline buffer's span so the
+// memory→Iterable bridge can vend `Iterator.Chunk`.
+extension Set.Ordered.Static: Memory.Contiguous.`Protocol` where Element: Copyable {
+    public var span: Swift.Span<Element> {
+        @_lifetime(borrow self)
         @inlinable
-        public mutating func nextSpan(maximumCount: Cardinal) -> Span<Element> {
-            _inner.nextSpan(maximumCount: maximumCount)
-        }
+        borrowing get { _buffer.span }
+    }
 
-        @inlinable
-        public mutating func next() -> Element? {
-            _inner.next()
-        }
+    @inlinable
+    public func withUnsafeBufferPointer<R, E: Swift.Error>(
+        _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
+    ) throws(E) -> R {
+        let span = _buffer.span
+        return try unsafe span.withUnsafeBufferPointer(body)
     }
 }
 
-extension Set.Ordered.Static.Iterator: Sendable where Element: Sendable {}
+// Iterable — multipass borrowing `makeIterator()` vended FOR FREE by the
+// memory→Iterable bridge over Memory.Contiguous.Protocol, yielding Iterator.Chunk.
+extension Set.Ordered.Static: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
+}
 
-// ============================================================================
-// MARK: - Sequenceable Conformance
-// ============================================================================
-
+// Sequenceable — single-pass consuming iterator. Enabled by `@frozen` on the
+// Static struct, which permits the partial consume of `_buffer`.
 extension Set.Ordered.Static: Sequenceable where Element: Copyable {
-    /// Returns an iterator over the set elements.
-    ///
-    /// Copies elements to a `Buffer.Linear` snapshot for safe iteration,
-    /// avoiding pointer escape issues with inline storage.
-    /// Elements are yielded in insertion order.
-    ///
-    /// - Note: Incurs O(n) copy cost. For performance-critical code, use
-    ///   the mutating `forEach` method instead.
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Buffer<Element>.Linear.Inline<capacity>.Scalar
+
     @inlinable
-    public borrowing func makeIterator() -> Iterator {
-        var snapshot = Buffer<Element>.Linear(minimumCapacity: count)
-        var i: Index<Element> = .zero
-        let end = count.map(Ordinal.init)
-        while i < end {
-            snapshot.append(_buffer[i])
-            i += .one
-        }
-        return Iterator(_inner: snapshot.makeIterator())
+    public consuming func makeIterator() -> Buffer<Element>.Linear.Inline<capacity>.Scalar {
+        _buffer.makeIterator()
     }
 
     /// Returns the count as the underestimated count since we know the exact size.

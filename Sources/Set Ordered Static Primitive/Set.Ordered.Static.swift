@@ -25,6 +25,10 @@ extension Set.Ordered where Element: ~Copyable {
     /// `Hash.Table<Element>.Static<capacity>` for O(1) position lookup.
     ///
     /// - Precondition: `capacity` must be a power of two (required by Hash.Table.Static).
+    // @frozen lifts the non-frozen partial-consume restriction so the consuming
+    // `Sequenceable.makeIterator()` can extract `_buffer`. ABI-freeze is fine
+    // pre-1.0 (principal-approved).
+    @frozen
     public struct Static<let capacity: Int>: ~Copyable {
         /// Element cleanup is handled by Storage.Inline's deinit.
 

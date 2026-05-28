@@ -9,6 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Iterator_Chunk_Primitives
+public import Iterable
+public import Sequence_Primitives
+public import Memory_Contiguous_Primitives
+public import Memory_Iterator_Primitives
+
 import Cardinal_Primitives
 import Index_Primitives
 internal import Ordinal_Primitives
@@ -19,54 +25,41 @@ public import Buffer_Linear_Bounded_Primitives
 public import Buffer_Linear_Primitive
 
 // ============================================================================
-// MARK: - Iterator
+// MARK: - Iterable + Sequenceable (Copyable elements only)
 // ============================================================================
+//
+// Re-uses Iterator.Chunk (multipass, borrowing) + Buffer.Linear.Bounded.Scalar
+// (single-pass, consuming), mirroring buffer-linear. No Swift.Sequence — the
+// iteration family is ~Copyable end-to-end.
 
-extension Set.Ordered.Fixed where Element: Copyable {
-    /// Iterator for Set.Ordered.Fixed that delegates to Buffer.Linear.Bounded.Iterator.
-    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
-        @usableFromInline
-        var _inner: Buffer<Element>.Linear.Bounded.Iterator
-
-        @usableFromInline
-        init(_inner: Buffer<Element>.Linear.Bounded.Iterator) {
-            self._inner = _inner
-        }
-
-        @_lifetime(&self)
+// Memory.Contiguous.Protocol exposes the insertion-ordered span so the
+// memory→Iterable bridge can vend `Iterator.Chunk`. `withUnsafeBufferPointer`
+// is provided in Set.Ordered.Fixed.swift (same module).
+extension Set.Ordered.Fixed: Memory.Contiguous.`Protocol` where Element: Copyable {
+    public var span: Swift.Span<Element> {
+        @_lifetime(borrow self)
         @inlinable
-        public mutating func nextSpan(maximumCount: Cardinal) -> Span<Element> {
-            _inner.nextSpan(maximumCount: maximumCount)
-        }
-
-        @inlinable
-        public mutating func next() -> Element? {
-            _inner.next()
-        }
+        borrowing get { buffer.span }
     }
 }
 
-extension Set.Ordered.Fixed.Iterator: Sendable where Element: Sendable {}
-
-// ============================================================================
-// MARK: - Swift.Sequence Conformance
-// ============================================================================
-
-extension Set.Ordered.Fixed: Swift.Sequence where Element: Copyable {
-    /// Returns an iterator over the elements of the set.
-    ///
-    /// Elements are yielded in insertion order.
-    @inlinable
-    public func makeIterator() -> Iterator {
-        Iterator(_inner: buffer.makeIterator())
-    }
+// Iterable — the multipass borrowing `makeIterator()` is vended FOR FREE by the
+// memory→Iterable bridge over the Memory.Contiguous.Protocol conformance above,
+// yielding `Iterator.Chunk` (no hand-written iterator).
+extension Set.Ordered.Fixed: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
 }
-
-// ============================================================================
-// MARK: - Sequenceable Conformance
-// ============================================================================
 
 extension Set.Ordered.Fixed: Sequenceable where Element: Copyable {
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Buffer<Element>.Linear.Bounded.Scalar
+
+    @inlinable
+    public consuming func makeIterator() -> Buffer<Element>.Linear.Bounded.Scalar {
+        buffer.makeIterator()
+    }
+
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable
     public var underestimatedCount: Int { Int(bitPattern: count) }

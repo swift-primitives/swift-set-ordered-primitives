@@ -9,62 +9,60 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Cardinal_Primitives
-import Index_Primitives
-internal import Ordinal_Primitives
-public import Set_Primitives
+public import Iterable
+public import Iterator_Chunk_Primitives
+public import Sequence_Primitives
+public import Memory_Contiguous_Primitives
+public import Memory_Iterator_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
 
-// MARK: - Iterator (Copyable elements only)
+// MARK: - Iterable + Sequenceable (Copyable elements only)
+//
+// Re-uses iterator-primitives' `Iterator.Chunk` (multipass, borrowing) for
+// `Iterable` and `Buffer.Linear.Scalar` (single-pass, consuming) for
+// `Sequenceable` — mirroring buffer-linear's dual conformance.
+//
+// `Iterable.makeIterator()` is vended FOR FREE by the memory→Iterable bridge
+// over the `Memory.Contiguous.Protocol` conformance (no hand-written iterator);
+// the bridge constructs `Iterator.Chunk(self.span)`, so the span lifetime ties
+// to `self` cleanly.
+//
+// `Set.Ordered` no longer conforms to `Swift.Sequence`: the iteration family is
+// `~Copyable, ~Escapable` end-to-end, which cannot back a Copyable stdlib
+// `IteratorProtocol`. Matches buffer-linear; PENDING ecosystem Swift.Sequence-
+// interop reconciliation (array-primitives still keeps Swift.Sequence where
+// Element: Copyable — the inconsistency is an ecosystem-wide decision to settle
+// uniformly later). Reversible; a set's core surface is membership/algebra, not
+// for-in, so the drop is low-impact now.
 
-// When Element: Copyable, Set.Ordered conforms to Swift.Sequence, enabling
-// for-in loops, map, filter, and other sequence operations.
-// For ~Copyable elements, use forEach() or index-based iteration instead.
-
-extension Set_Primitives.Set.Ordered where Element: Copyable {
-    /// Iterator for Set.Ordered that delegates to Buffer.Linear.Iterator.
-    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
-        @usableFromInline
-        var _inner: Buffer<Element>.Linear.Iterator
-
-        @usableFromInline
-        init(_inner: Buffer<Element>.Linear.Iterator) {
-            self._inner = _inner
-        }
-
-        @_lifetime(&self)
+// Memory.Contiguous.Protocol exposes the insertion-ordered span so the
+// memory→Iterable bridge can vend `Iterator.Chunk`. `withUnsafeBufferPointer`
+// is provided in Set.Ordered ~Copyable.swift (same module).
+extension Set.Ordered: Memory.Contiguous.`Protocol` where Element: Copyable {
+    public var span: Swift.Span<Element> {
+        @_lifetime(borrow self)
         @inlinable
-        public mutating func nextSpan(maximumCount: Cardinal) -> Span<Element> {
-            _inner.nextSpan(maximumCount: maximumCount)
-        }
-
-        @inlinable
-        public mutating func next() -> Element? {
-            _inner.next()
-        }
-    }
-
-    /// Returns an iterator over the elements of the set.
-    ///
-    /// This enables `for element in set` syntax without requiring
-    /// Swift.Sequence conformance (which would require Copyable).
-    @inlinable
-    public borrowing func makeIterator() -> Iterator {
-        Iterator(_inner: buffer.makeIterator())
+        borrowing get { buffer.span }
     }
 }
 
-extension Set_Primitives.Set.Ordered.Iterator: Sendable where Element: Sendable {}
+extension Set.Ordered: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
+}
 
-// MARK: - Conditional Sequence
+extension Set.Ordered: Sequenceable where Element: Copyable {
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Buffer<Element>.Linear.Scalar
 
-/// `Set.Ordered` conforms to `Swift.Sequence` when `Element` is `Copyable`.
-///
-/// This enables `for-in` loops, `map`, `filter`, and other sequence operations.
-/// For iteration without Copyable, use ``forEach(_:)`` instead.
-extension Set_Primitives.Set.Ordered: Swift.Sequence where Element: Copyable {
-    // Note: Iterator is already defined below in the Iterator section.
-    // Sequence conformance uses the existing makeIterator() method.
+    @inlinable
+    public consuming func makeIterator() -> Buffer<Element>.Linear.Scalar {
+        buffer.makeIterator()
+    }
+
+    /// Returns the count as the underestimated count since we know the exact size.
+    @inlinable
+    public var underestimatedCount: Int { Int(bitPattern: count) }
 }

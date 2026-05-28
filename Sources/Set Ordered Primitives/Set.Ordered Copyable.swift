@@ -296,19 +296,6 @@ extension Set.Ordered: ExpressibleByArrayLiteral where Element: Copyable {
 extension Set.Ordered: Set.`Protocol` {}
 
 // ============================================================================
-// MARK: - Sequenceable Conformance
-// ============================================================================
-
-extension Set.Ordered: Sequenceable where Element: Copyable {
-    /// Returns the count as the underestimated count since we know the exact size.
-    ///
-    /// This explicit implementation resolves ambiguity between Swift.Sequence
-    /// and Sequenceable+Swift.Sequence default implementation.
-    @inlinable
-    public var underestimatedCount: Int { Int(bitPattern: count) }
-}
-
-// ============================================================================
 // MARK: - Sequence.Clearable Conformance
 // ============================================================================
 
