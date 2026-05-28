@@ -88,6 +88,10 @@ let package = Package(
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Inline Primitives", package: "swift-buffer-linear-primitives"),
+                // [MOD-036] refined-C: the hot operation surface (insert/remove/
+                // bounded-index access/iteration witnesses) co-located here imports these.
+                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
+                .product(name: "Finite Primitives", package: "swift-finite-primitives"),
             ]
         ),
 
@@ -135,9 +139,7 @@ let package = Package(
                 .product(name: "Iterable", package: "swift-iterator-primitives"),
                 .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
                 .product(name: "Property Primitives", package: "swift-property-primitives"),
-                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
-                .product(name: "Finite Primitives", package: "swift-finite-primitives"),
             ]
         ),
 

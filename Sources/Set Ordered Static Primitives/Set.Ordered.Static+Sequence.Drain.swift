@@ -12,12 +12,12 @@
 internal import Property_Primitives
 import Sequence_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
+public import Set_Ordered_Static_Primitive
 
 // MARK: - Sequence.Drain.Protocol Conformance
 
 extension Set_Primitives.Set.Ordered.Static: Sequence.Drain.`Protocol` {
-    // drain(_ body:) method already exists in Set.Ordered.Static.swift
+    // drain(_ body:) method lives in the type module (Set.Ordered.Static ~Copyable.swift)
 }
 
 // MARK: - Property Accessor

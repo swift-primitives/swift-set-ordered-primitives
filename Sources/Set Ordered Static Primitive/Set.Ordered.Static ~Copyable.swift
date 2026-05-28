@@ -11,13 +11,15 @@
 
 import Finite_Primitives
 import Index_Primitives
+import Ordinal_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
 public import Buffer_Linear_Inline_Primitives
-public import Buffer_Linear_Primitive
+import Buffer_Linear_Primitive
 
-// Note: Set.Ordered.Static is declared inside Set.Ordered (in Set.swift).
-// This file contains only extensions to Set.Ordered.Static.
+// Note: Set.Ordered.Static is declared inside Set.Ordered (in Set.Ordered.Static.swift,
+// same module). This file holds the hot-operation surface co-located with the storage
+// ([MOD-036] refined-C). Set.Ordered.Static is unconditionally ~Copyable, so this whole
+// surface works for ~Copyable elements.
 //
 // ## Architecture
 //
@@ -35,15 +37,15 @@ public import Buffer_Linear_Primitive
 extension Set_Primitives.Set.Ordered.Static {
     /// The number of elements in the set.
     @inlinable
-    public var count: Index<Element>.Count { _buffer.count }
+    public var count: Index<Element>.Count { buffer.count }
 
     /// Whether the set is empty.
     @inlinable
-    public var isEmpty: Bool { _hashTable.isEmpty }
+    public var isEmpty: Bool { hashTable.isEmpty }
 
     /// Whether the set is at full capacity.
     @inlinable
-    public var isFull: Bool { _hashTable.isFull }
+    public var isFull: Bool { hashTable.isFull }
 }
 
 // MARK: - Core Operations
@@ -56,10 +58,10 @@ extension Set_Primitives.Set.Ordered.Static {
     /// - Complexity: O(1) average, O(n) worst case.
     @inlinable
     public func index(_ element: borrowing Element) -> Index<Element>.Bounded<capacity>? {
-        _hashTable.position(
+        hashTable.position(
             forHash: element.hashValue,
             context: element,
-            equals: { idx, elem in _buffer[idx] == elem }
+            equals: { idx, elem in buffer[idx] == elem }
         )
     }
 
@@ -68,10 +70,10 @@ extension Set_Primitives.Set.Ordered.Static {
     /// - Complexity: O(1) average, O(n) worst case.
     @inlinable
     public func contains(_ element: borrowing Element) -> Bool {
-        _hashTable.position(
+        hashTable.position(
             forHash: element.hashValue,
             context: element,
-            equals: { idx, elem in _buffer[idx] == elem }
+            equals: { idx, elem in buffer[idx] == elem }
         ) != nil
     }
 
@@ -87,24 +89,24 @@ extension Set_Primitives.Set.Ordered.Static {
         let hashValue = element.hashValue
 
         // Check for existing element
-        if let existingPosition = _hashTable.position(
+        if let existingPosition = hashTable.position(
             forHash: hashValue,
             equals: { idx in
-                _buffer[idx] == element
+                buffer[idx] == element
             }
         ) {
             return (false, existingPosition)
         }
 
         // Check capacity
-        guard !_hashTable.isFull else {
+        guard !hashTable.isFull else {
             throw .overflow(.init())
         }
 
         // Insert at next available position (count < capacity since !isFull)
-        let position: Index<Element>.Bounded<capacity> = .init(_buffer.count.map(Ordinal.init))!
-        _ = _buffer.append(element)
-        _hashTable.insert(_unchecked: (), position: position, hashValue: hashValue)
+        let position: Index<Element>.Bounded<capacity> = .init(buffer.count.map(Ordinal.init))!
+        _ = buffer.append(element)
+        hashTable.insert(_unchecked: (), position: position, hashValue: hashValue)
 
         return (true, position)
     }
@@ -119,20 +121,20 @@ extension Set_Primitives.Set.Ordered.Static {
     public mutating func remove(_ element: borrowing Element) -> Element? {
         // Find and remove from hash table
         guard
-            let removedPosition = _hashTable.remove(
+            let removedPosition = hashTable.remove(
                 hashValue: element.hashValue,
                 context: element,
-                equals: { idx, elem in _buffer[idx] == elem }
+                equals: { idx, elem in buffer[idx] == elem }
             )
         else {
             return nil
         }
 
         // Remove element from buffer (shifts remaining elements left)
-        let removed = _buffer.remove(at: removedPosition)
+        let removed = buffer.remove(at: removedPosition)
 
         // Update positions in hash table for shifted elements
-        _hashTable.positions.decrement(after: removedPosition)
+        hashTable.positions.decrement(after: removedPosition)
 
         return removed
     }
@@ -140,9 +142,9 @@ extension Set_Primitives.Set.Ordered.Static {
     /// Removes all elements from the set.
     @inlinable
     public mutating func clear() {
-        guard _hashTable.count > .zero else { return }
-        _buffer.removeAll()
-        _hashTable.remove.all()
+        guard hashTable.count > .zero else { return }
+        buffer.removeAll()
+        hashTable.remove.all()
     }
 }
 
@@ -155,7 +157,7 @@ extension Set_Primitives.Set.Ordered.Static {
         guard index < count else {
             throw .bounds(.init(index: index, count: count))
         }
-        return _buffer[index]
+        return buffer[index]
     }
 
     /// Accesses the element at a capacity-bounded index.
@@ -169,14 +171,14 @@ extension Set_Primitives.Set.Ordered.Static {
         guard unbounded < count else {
             throw .bounds(.init(index: Index<Element>(index), count: count))
         }
-        return _buffer[index]
+        return buffer[index]
     }
 
     /// Subscript access to elements by index.
     @inlinable
     public subscript(index: Index<Element>) -> Element {
         precondition(index < count, "Index out of bounds")
-        return _buffer[index]
+        return buffer[index]
     }
 
     /// Subscript access to elements by capacity-bounded index.
@@ -187,7 +189,7 @@ extension Set_Primitives.Set.Ordered.Static {
     @inlinable
     public subscript(index: Index<Element>.Bounded<capacity>) -> Element {
         precondition(index < count, "Index out of bounds")
-        return _buffer[index]
+        return buffer[index]
     }
 }
 
@@ -197,7 +199,7 @@ extension Set_Primitives.Set.Ordered.Static {
     /// The first element, or `nil` if the set is empty.
     @inlinable
     public var first: Element? {
-        count > .zero ? _buffer[.zero] : nil
+        count > .zero ? buffer[.zero] : nil
     }
 
     /// The last element, or `nil` if the set is empty.
@@ -205,7 +207,7 @@ extension Set_Primitives.Set.Ordered.Static {
     public var last: Element? {
         guard count > .zero else { return nil }
         let lastIndex = count.subtract.saturating(.one).map(Ordinal.init)
-        return _buffer[lastIndex]
+        return buffer[lastIndex]
     }
 }
 
@@ -216,25 +218,25 @@ extension Set_Primitives.Set.Ordered.Static {
     @inlinable
     public func withElement<R>(at index: Index<Element>, _ body: (borrowing Element) -> R) -> R {
         precondition(index < count, "Index out of bounds")
-        return body(_buffer[index])
+        return body(buffer[index])
     }
 
     /// Accesses the element at a capacity-bounded index via closure.
     @inlinable
     public func withElement<R>(at index: Index<Element>.Bounded<capacity>, _ body: (borrowing Element) -> R) -> R {
         precondition(index < count, "Index out of bounds")
-        return body(_buffer[index])
+        return body(buffer[index])
     }
 
     /// Iterates over all elements in the set.
     @inlinable
     public func forEach<E: Swift.Error>(_ body: (borrowing Element) throws(E) -> Void) throws(E) {
-        let count = _buffer.count
+        let count = buffer.count
         guard count > .zero else { return }
         var index: Index<Element> = .zero
         let end = count.map(Ordinal.init)
         while index < end {
-            try body(_buffer[index])
+            try body(buffer[index])
             index += .one
         }
     }
@@ -242,14 +244,14 @@ extension Set_Primitives.Set.Ordered.Static {
     /// Removes and consumes all elements.
     @inlinable
     public mutating func drain(_ body: (consuming Element) -> Void) {
-        guard _hashTable.count > .zero else { return }
+        guard hashTable.count > .zero else { return }
 
-        while !_buffer.isEmpty {
-            body(_buffer.remove.first())
+        while !buffer.isEmpty {
+            body(buffer.remove.first())
         }
 
         // Clear hash table
-        _hashTable.remove.all()
+        hashTable.remove.all()
     }
 }
 

@@ -11,7 +11,7 @@
 
 import Sequence_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
+public import Set_Ordered_Static_Primitive
 public import Buffer_Linear_Inline_Primitives
 public import Buffer_Linear_Primitive
 
@@ -19,8 +19,9 @@ public import Buffer_Linear_Primitive
 //
 // Set.Ordered.Static delegates consuming iteration to Buffer.Linear.Inline.
 // Direct delegation — no swap needed because Inline.consume() is mutating,
-// leaving the buffer empty so the set's deinit (which calls _buffer.removeAll())
-// is harmless.
+// leaving the buffer empty so the set's deinit is harmless. The buffer is reached
+// through the `package` `takeBuffer()` accessor in the type module (no underscored
+// window).
 
 extension Set_Primitives.Set.Ordered.Static {
     /// Returns a consuming view: `.consume().forEach { }`
@@ -33,9 +34,12 @@ extension Set_Primitives.Set.Ordered.Static {
     /// ```
     ///
     /// - Complexity: O(n) to create the view (element transfer). O(1) per element during iteration.
-    @inlinable
+    // Non-`@inlinable` ([MOD-036] refined-C): cold conformance reaching storage
+    // through the `package` `takeBuffer()` accessor (no underscored window).
+    // `Buffer.Linear.Inline.consume()` is `mutating` (not `consuming`), so the
+    // surrendered buffer is bound to a `var` before the consume call.
     public consuming func consume() -> Sequence.Consume.View<Element, Buffer<Element>.Linear.Inline<capacity>.ConsumeState> {
-        return _buffer.consume()
-        // _buffer is now empty; deinit calls _buffer.removeAll() — no-op
+        var consumeBuffer = takeBuffer()
+        return consumeBuffer.consume()
     }
 }

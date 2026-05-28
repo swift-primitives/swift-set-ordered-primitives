@@ -26,28 +26,35 @@ extension Set.Ordered where Element: ~Copyable {
     ///
     /// - Precondition: `capacity` must be a power of two (required by Hash.Table.Static).
     // @frozen lifts the non-frozen partial-consume restriction so the consuming
-    // `Sequenceable.makeIterator()` can extract `_buffer`. ABI-freeze is fine
+    // `Sequenceable.makeIterator()` can extract `buffer`. ABI-freeze is fine
     // pre-1.0 (principal-approved).
     @frozen
     public struct Static<let capacity: Int>: ~Copyable {
         /// Element cleanup is handled by Storage.Inline's deinit.
 
         /// Element storage using Buffer.Linear.Inline from buffer-primitives.
+        ///
+        /// `@usableFromInline internal` ([MOD-036] refined-C): the hot
+        /// `~Copyable`/`Copyable` operation surface co-located in this (type)
+        /// module inlines cross-package to zero-witness-dispatch; the cold
+        /// sequence/collection-family conformances in the ops module reach this
+        /// storage only through the public `span` / `makeIterator` witnesses and
+        /// the `package takeBuffer()` accessor in `Set.Ordered.Static+Iteration.swift`.
         @usableFromInline
-        package var _buffer: Buffer<Element>.Linear.Inline<capacity>
+        internal var buffer: Buffer<Element>.Linear.Inline<capacity>
 
         /// Hash table for O(1) position lookup.
         @usableFromInline
-        package var _hashTable: Hash.Table<Element>.Static<capacity>
+        internal var hashTable: Hash.Table<Element>.Static<capacity>
 
         /// Creates an empty inline ordered set.
         ///
         /// - Precondition: `capacity` must be a power of two.
         @inlinable
         public init() {
-            self._buffer = Buffer<Element>.Linear.Inline<capacity>()
+            self.buffer = Buffer<Element>.Linear.Inline<capacity>()
             // Hash.Table.Static.init() validates power-of-two capacity
-            self._hashTable = Hash.Table<Element>.Static<capacity>()
+            self.hashTable = Hash.Table<Element>.Static<capacity>()
         }
 
     }

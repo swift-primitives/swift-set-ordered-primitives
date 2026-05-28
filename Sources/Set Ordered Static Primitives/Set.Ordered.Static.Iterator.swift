@@ -12,17 +12,14 @@
 public import Iterator_Chunk_Primitives
 public import Iterable
 public import Sequence_Primitives
-public import Buffer_Linear_Inline_Primitives
 public import Memory_Contiguous_Primitives
 public import Memory_Iterator_Primitives
-
-import Cardinal_Primitives
-import Index_Primitives
-public import Ordinal_Primitives
-public import Set_Primitives
-public import Set_Ordered_Primitive
+// `@_spi(Unsafe)` ([MOD-016] per-file): the `withUnsafeBufferPointer` witness for
+// `Memory.Contiguous.Protocol` is the `@_spi(Unsafe)` hot op co-located in the type
+// module ([MOD-036] refined-C); this conformance file must opt into the SPI to see it.
+@_spi(Unsafe) public import Set_Ordered_Static_Primitive
 public import Buffer_Linear_Primitive
-public import Buffer_Linear_Primitives
+public import Buffer_Linear_Inline_Primitives
 
 // Note: Set.Ordered.Static is unconditionally ~Copyable (inline storage requires deinit),
 // so it cannot conform to Swift.Sequence which requires Copyable.
@@ -37,24 +34,14 @@ public import Buffer_Linear_Primitives
 // Inline variant. The borrowing Iterable iterator is tied to `self` via
 // `@_lifetime(borrow self)`, so no snapshot copy is needed. No Swift.Sequence
 // (Static is unconditionally ~Copyable).
+//
+// Witnesses (`span`, `makeIterator`, `withUnsafeBufferPointer`) are public members
+// in the type module; these conformances are thin ([MOD-036] refined-C).
 
 // Memory.Contiguous.Protocol exposes the inline buffer's span so the
-// memory→Iterable bridge can vend `Iterator.Chunk`.
-extension Set.Ordered.Static: Memory.Contiguous.`Protocol` where Element: Copyable {
-    public var span: Swift.Span<Element> {
-        @_lifetime(borrow self)
-        @inlinable
-        borrowing get { _buffer.span }
-    }
-
-    @inlinable
-    public func withUnsafeBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        let span = _buffer.span
-        return try unsafe span.withUnsafeBufferPointer(body)
-    }
-}
+// memory→Iterable bridge can vend `Iterator.Chunk`. `span` and
+// `withUnsafeBufferPointer` are provided in the type module (same package).
+extension Set.Ordered.Static: Memory.Contiguous.`Protocol` where Element: Copyable {}
 
 // Iterable — multipass borrowing `makeIterator()` vended FOR FREE by the
 // memory→Iterable bridge over Memory.Contiguous.Protocol, yielding Iterator.Chunk.
@@ -63,38 +50,14 @@ extension Set.Ordered.Static: Iterable where Element: Copyable {
     public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
 }
 
-// Sequenceable — single-pass consuming iterator. Enabled by `@frozen` on the
-// Static struct, which permits the partial consume of `_buffer`.
+// Sequenceable — single-pass consuming iterator. The consuming `makeIterator()`
+// witness is a public member in the type module ([MOD-036] refined-C); this
+// conformance is thin.
 extension Set.Ordered.Static: Sequenceable where Element: Copyable {
     @_implements(Sequenceable, Iterator)
     public typealias SequenceableIterator = Buffer<Element>.Linear.Inline<capacity>.Scalar
 
-    @inlinable
-    public consuming func makeIterator() -> Buffer<Element>.Linear.Inline<capacity>.Scalar {
-        _buffer.makeIterator()
-    }
-
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable
     public var underestimatedCount: Int { Int(bitPattern: count) }
-}
-
-// ============================================================================
-// MARK: - Set.Protocol Conformance
-// ============================================================================
-
-extension Set.Ordered.Static: Set.`Protocol` {}
-
-// ============================================================================
-// MARK: - Sequence.Clearable Conformance
-// ============================================================================
-
-extension Set.Ordered.Static: Sequence.Clearable where Element: Copyable {
-    /// Removes all elements from the set.
-    ///
-    /// This enables `.forEach.consuming { }` pattern via `Property.Inout` extension.
-    @inlinable
-    public mutating func removeAll() {
-        clear()
-    }
 }
