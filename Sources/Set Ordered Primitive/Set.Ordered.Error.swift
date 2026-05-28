@@ -155,17 +155,11 @@ extension __SetOrderedInlineError: CustomStringConvertible {
 
 // MARK: - Error Typealiases
 
-extension Set_Primitives.Set.Ordered {
+extension Set.Ordered {
     /// Errors that can occur during ordered set operations.
     public typealias Error = __SetOrderedError<Element>
 }
 
-extension Set_Primitives.Set.Ordered.Fixed {
-    /// Errors that can occur during Fixed ordered set operations.
-    public typealias Error = __SetOrderedFixedError<Element>
-}
-
-extension Set_Primitives.Set.Ordered.Static {
-    /// Errors that can occur during inline ordered set operations.
-    public typealias Error = __SetOrderedInlineError<Element>
-}
+// `Set.Ordered.Fixed.Error` and `Set.Ordered.Static.Error` typealiases live in
+// their respective variant target modules (Set Ordered Fixed Primitive /
+// Set Ordered Static Primitive), since `Fixed`/`Static` are declared there.

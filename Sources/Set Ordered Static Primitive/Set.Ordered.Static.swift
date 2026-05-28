@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitives
+public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Inline_Primitives
 import Hash_Table_Primitives
@@ -52,3 +52,10 @@ extension Set.Ordered where Element: ~Copyable {
 // MARK: - Sendable
 
 extension Set.Ordered.Static: @unsafe @unchecked Sendable where Element: Sendable {}
+
+// MARK: - Error Typealias
+
+extension Set.Ordered.Static {
+    /// Errors that can occur during inline ordered set operations.
+    public typealias Error = __SetOrderedInlineError<Element>
+}
