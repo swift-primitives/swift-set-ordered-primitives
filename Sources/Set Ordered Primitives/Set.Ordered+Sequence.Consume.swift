@@ -44,10 +44,6 @@ extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// - Complexity: O(1) to create the view. O(1) per element during iteration.
     @inlinable
     public consuming func consume() -> Sequence.Consume.View<Element, Buffer<Element>.Linear.ConsumeState> {
-        var mutableSelf = self
-        mutableSelf.makeUnique()
-        var consumeBuffer = Buffer<Element>.Linear(minimumCapacity: .zero)
-        Swift.swap(&mutableSelf.buffer, &consumeBuffer)
-        return consumeBuffer.consume()
+        _takeBuffer().consume()
     }
 }

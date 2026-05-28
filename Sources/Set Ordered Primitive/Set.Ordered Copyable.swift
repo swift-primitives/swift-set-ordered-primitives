@@ -13,7 +13,6 @@ public import Cardinal_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
 
@@ -277,34 +276,3 @@ extension Set.Ordered: Hash.`Protocol` {
         }
     }
 #endif
-
-// ============================================================================
-// MARK: - ExpressibleByArrayLiteral
-// ============================================================================
-
-extension Set.Ordered: ExpressibleByArrayLiteral where Element: Copyable {
-    @inlinable
-    public init(arrayLiteral elements: Element...) {
-        self.init(elements)
-    }
-}
-
-// ============================================================================
-// MARK: - Set.Protocol Conformance
-// ============================================================================
-
-extension Set.Ordered: Set.`Protocol` {}
-
-// ============================================================================
-// MARK: - Sequence.Clearable Conformance
-// ============================================================================
-
-extension Set.Ordered: Sequence.Clearable where Element: Copyable {
-    /// Removes all elements from the set.
-    ///
-    /// This enables `.forEach.consuming { }` pattern via `Property.Inout` extension.
-    @inlinable
-    public mutating func removeAll() {
-        clear(keepingCapacity: false)
-    }
-}

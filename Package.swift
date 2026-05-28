@@ -56,6 +56,10 @@ let package = Package(
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
+                // [MOD-036] refined-C: the hot operation surface (insert/remove/
+                // algebra/indexed/builder) co-located here imports these.
+                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
+                .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
         ),
 

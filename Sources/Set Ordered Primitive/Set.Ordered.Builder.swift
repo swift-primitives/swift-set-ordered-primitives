@@ -10,7 +10,6 @@
 // ===----------------------------------------------------------------------===//
 
 public import Set_Primitives
-public import Set_Ordered_Primitive
 
 extension Set.Ordered where Element: Copyable {
     /// A result builder for declaratively constructing ordered sets.

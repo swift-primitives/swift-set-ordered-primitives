@@ -32,12 +32,19 @@ extension Set where Element: Hash.`Protocol` & ~Copyable {
         // MARK: - Stored Properties
 
         /// Element storage using Buffer.Linear from buffer-primitives.
+        ///
+        /// `@usableFromInline internal` ([MOD-036] refined-C): the hot
+        /// `~Copyable`/`Copyable` operation surface co-located in this (type)
+        /// module inlines cross-package to zero-witness-dispatch; the cold
+        /// sequence/collection-family conformances in the ops module reach this
+        /// storage only through the `package` windows in
+        /// `Set.Ordered+ConformanceSupport.swift`.
         @usableFromInline
-        package var buffer: Buffer<Element>.Linear
+        internal var buffer: Buffer<Element>.Linear
 
         /// Hash table for O(1) position lookup.
         @usableFromInline
-        package var hashTable: Hash.Table<Element>
+        internal var hashTable: Hash.Table<Element>
 
         // MARK: - Initialization
 
