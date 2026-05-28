@@ -75,6 +75,31 @@ the buffer's public API. Reworked to the windowless shape above.)
    the `?` already conveys spill-only; no intra-Small ambiguity). Keep `isSpilled`.
    (`_buildHashTable()` → `buildHashTable()` is a Small-variant rename, not base.)
 
+## Backing-delegation principle (principal, 2026-05-28) — NO ops-module forwarders
+
+A cold conformance reaching the type's internal storage MUST be one of:
+- **(a) in-type direct access** — the witness is a `public`/`@inlinable` member
+  co-located WITH the storage in the type module, light imports (e.g. `span`,
+  `makeIterator` delegating to `buffer`'s public API); or
+- **(b) inherited generic op over a buffer-coupled witness** — e.g.
+  `Memory.Contiguous.Protocol` → `Iterable` (the generic iterable op is inherited
+  over the contiguous witness).
+
+It MUST NOT be **(c) an ops-module forwarder reaching back through an accessor** —
+e.g. `consume()` in the ops module calling a `package takeBuffer()` on the type
+module. `takeBuffer()` is a single-use cross-module accessor forced because
+`consume()` returns a sequence-primitives type (`Sequence.Consume.View`) and got
+exiled to the ops module — a decomposition smell, not a needed helper.
+
+**Status (2026-05-28):** `consume()` is DISTINCT from the `.forEach.consuming`
+drain — `Sequence.Consume.View` is a composable owning value with `next()` +
+`forEach` (exercised in 8+ tests incl. `var view = set.consume(); while let e =
+view.next()`), so it is NOT droppable-as-redundant. The decomposition fix
+(generic-op-over-`Consumable`-witness, or other) FOLDS INTO Track 3 (the gated
+Sequenceable/drain/consume surface — the architecture decision). `takeBuffer()`
+currently exists as an INTERIM in base + Fixed + Static. **The fan-out MUST NOT
+replicate the `takeBuffer` shape — it is interim, pending the Track 3 resolution.**
+
 ---
 
 ## Original deferral note (preserved for reference)
