@@ -62,14 +62,14 @@ extension Set_Primitives.Set.Ordered where Element: Copyable {
     // TRACKING: unsafe-audit-findings.md Category D SP-4.
     public struct Indexed<Tag: Copyable>: Copyable, @unchecked Sendable {
         @usableFromInline
-        var _storage: Set_Primitives.Set<Element>.Ordered
+        var storage: Set_Primitives.Set<Element>.Ordered
 
         /// Creates an indexed wrapper around the given storage.
         ///
         /// - Parameter storage: The ordered set to wrap.
         @inlinable
         public init(_ storage: consuming Set_Primitives.Set<Element>.Ordered) {
-            self._storage = storage
+            self.storage = storage
         }
 
         /// The phantom-typed count for bounds checking.
@@ -80,7 +80,7 @@ extension Set_Primitives.Set.Ordered where Element: Copyable {
         /// ```
         @inlinable
         public var count: Index_Primitives.Index<Tag>.Count {
-            _storage.count.retag(Tag.self)
+            storage.count.retag(Tag.self)
         }
 
         /// Accesses the element at the given phantom-typed index.
@@ -91,8 +91,8 @@ extension Set_Primitives.Set.Ordered where Element: Copyable {
         public subscript(index: Index_Primitives.Index<Tag>) -> Element {
             get {
                 let elementIndex = index.retag(Element.self)
-                precondition(elementIndex < _storage.count, "Index out of bounds")
-                return _storage.buffer[elementIndex]
+                precondition(elementIndex < storage.count, "Index out of bounds")
+                return storage.buffer[elementIndex]
             }
         }
     }
@@ -103,12 +103,12 @@ extension Set_Primitives.Set.Ordered where Element: Copyable {
 extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// Whether the set is empty.
     @inlinable
-    public var isEmpty: Bool { _storage.isEmpty }
+    public var isEmpty: Bool { storage.isEmpty }
 
     /// The current capacity of the set.
     @inlinable
     public var capacity: Index_Primitives.Index<Tag>.Count {
-        _storage.capacity.retag(Tag.self)
+        storage.capacity.retag(Tag.self)
     }
 }
 
@@ -118,13 +118,13 @@ extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// Returns whether the set contains the given element.
     @inlinable
     public func contains(_ element: Element) -> Bool {
-        _storage.contains(element)
+        storage.contains(element)
     }
 
     /// Returns the typed index of the given element, or `nil` if not present.
     @inlinable
     public func index(_ element: Element) -> Index_Primitives.Index<Tag>? {
-        guard let rawIndex = _storage.index(element) else { return nil }
+        guard let rawIndex = storage.index(element) else { return nil }
         return rawIndex.retag(Tag.self)
     }
 }
@@ -139,7 +139,7 @@ extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     @inlinable
     @discardableResult
     public mutating func insert(_ element: Element) -> (inserted: Bool, index: Index_Primitives.Index<Tag>) {
-        let result = _storage.insert(element)
+        let result = storage.insert(element)
         return (result.inserted, result.index.retag(Tag.self))
     }
 
@@ -150,7 +150,7 @@ extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     @inlinable
     @discardableResult
     public mutating func remove(_ element: Element) -> Element? {
-        _storage.remove(element)
+        storage.remove(element)
     }
 
     /// Removes all elements from the set.
@@ -158,7 +158,7 @@ extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// - Parameter keepingCapacity: Whether to keep the current capacity.
     @inlinable
     public mutating func clear(keepingCapacity: Bool = false) {
-        _storage.clear(keepingCapacity: keepingCapacity)
+        storage.clear(keepingCapacity: keepingCapacity)
     }
 }
 
@@ -167,9 +167,9 @@ extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
 extension Set_Primitives.Set.Ordered.Indexed where Element: Copyable {
     /// The first element, or `nil` if the set is empty.
     @inlinable
-    public var first: Element? { _storage.first }
+    public var first: Element? { storage.first }
 
     /// The last element, or `nil` if the set is empty.
     @inlinable
-    public var last: Element? { _storage.last }
+    public var last: Element? { storage.last }
 }

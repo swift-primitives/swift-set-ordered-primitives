@@ -1,9 +1,13 @@
-# [MOD-036] Type/Ops Boundary — IN PROGRESS (base variant DONE)
+# [MOD-036] Type/Ops Boundary — IN PROGRESS (base variant DONE + APPROVED)
 
-**Status:** IN PROGRESS. The **base variant is DONE** (refined-C, commit
-`10e120d`, build green + 126 tests pass) following swift-buffer-linear-primitives'
-proven pattern. **Fixed / Static / Small variants PENDING.** Each satellite needs
-its own per-variant surgery — they are NOT pure mechanical mirrors of base:
+**Status:** IN PROGRESS. The **base variant is DONE and supervisor-APPROVED** as
+THE replication template — the windowless refined-C shape (commit `a70a436`;
+build green, supervisor-verified 128 tests, hot-op cross-package inlining
+preserved, no underscored windows). The earlier windowed draft (`10e120d`,
+`_span`/`_makeScalar`/`_takeBuffer`) is SUPERSEDED — the fan-out copies the
+windowless shape (recipe below), not the draft. **Fixed / Static / Small variants
+PENDING.** Each satellite needs its own per-variant surgery — they are NOT pure
+mechanical mirrors of base:
 - **Fixed**: same storage shape as base (`package var buffer`/`hashTable`) but
   conformances are organized differently (no separate `.Iterator.swift`; bundled
   in the ops-side `Set.Ordered.Fixed.swift`).
@@ -51,6 +55,25 @@ storage-access path of the cold conformances changed, not the conformance set.
 buffer-linear's raw-storage-owner pattern. That over-applied — set-ordered
 composes Buffer.Linear rather than owning raw `Storage.Heap`, so it delegates to
 the buffer's public API. Reworked to the windowless shape above.)
+
+## Quality bars (principal, 2026-05-28) — apply to every variant AND the fan-out
+
+1. **No Copyable/~Copyable MODULE split.** The Copyable surface includes hot
+   `@inlinable` ops (Algebra/Indexed/Builder) that MUST co-locate with storage in
+   the type module for cross-package inlining — a separate module re-opens
+   [MOD-036]. Keep Copyable/~Copyable at the FILE level (`X Copyable.swift` /
+   `X ~Copyable.swift`); keep hot/cold at the MODULE level (type `Primitive` / ops
+   `Primitives`). Do NOT split a cold-Copyable module either (premature — iteration
+   shape gated; low value).
+2. **No non-inlinability underscores.** Storage is `@usableFromInline internal var
+   buffer` / `hashTable` — no underscore (the base proved it needs none). Strip
+   `_buffer`/`_hashTable`/`_heapHashTable`/`_storage`/`_buildHashTable` →
+   de-underscored. Keep an underscore ONLY if a concrete `@frozen` not-API signal
+   genuinely requires it (it shouldn't). Base touch-up applied: `_storage` →
+   `storage` in `Set.Ordered.Indexed.swift`.
+3. **`_heapHashTable` → `hashTable`** (Small variant): drop "heap" (impl detail;
+   the `?` already conveys spill-only; no intra-Small ambiguity). Keep `isSpilled`.
+   (`_buildHashTable()` → `buildHashTable()` is a Small-variant rename, not base.)
 
 ---
 
