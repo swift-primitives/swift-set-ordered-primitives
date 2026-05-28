@@ -1,4 +1,36 @@
-# [MOD-036] Type/Ops Boundary — DEFERRED (tracked modularization debt)
+# [MOD-036] Type/Ops Boundary — IN PROGRESS (base variant DONE)
+
+**Status:** IN PROGRESS. The **base variant is DONE** (refined-C, commit
+`10e120d`, build green + 126 tests pass) following swift-buffer-linear-primitives'
+proven pattern. **Fixed / Static / Small variants PENDING.** Each satellite needs
+its own per-variant surgery — they are NOT pure mechanical mirrors of base:
+- **Fixed**: same storage shape as base (`package var buffer`/`hashTable`) but
+  conformances are organized differently (no separate `.Iterator.swift`; bundled
+  in the ops-side `Set.Ordered.Fixed.swift`).
+- **Static**: storage is `package var _buffer: Buffer.Linear.Inline<capacity>` /
+  `_hashTable: Hash.Table.Static<capacity>` (underscore-prefixed, with `buffer`/
+  `storage` accessors) — the flip target + window shape differ.
+- **Small**: adds spill state (`_heapHashTable: Hash.Table?`, `isSpilled`) over
+  `_buffer: Buffer.Linear.Small<inlineCapacity>` — most divergent.
+
+**Base-variant recipe applied (the template for the satellites):**
+1. storage `@usableFromInline package` → `@usableFromInline internal`;
+2. hot internal-touching ops (Copyable/~Copyable methods, Algebra, Indexed,
+   Builder) + Hash.Protocol move into the `{…} Primitive` (type) module;
+3. cold seq/coll-family conformances (Memory.Contiguous, Sequenceable,
+   Sequence.Consume) stay in the ops module behind `package` windows
+   (`_span`/`_makeScalar`/`_takeBuffer`) in `…+ConformanceSupport.swift`;
+4. ExpressibleByArrayLiteral / Set.Protocol / Sequence.Clearable split to own ops
+   files; Iterator/conformance file opts into `@_spi(Unsafe)` per [MOD-016] for
+   the moved `withUnsafeBufferPointer` witness;
+5. type target gains Cardinal/Ordinal product deps.
+
+Iteration-conformance shape left UNCHANGED (Track 3, supervisor-gated): only the
+storage-access path of the cold conformances changed, not the conformance set.
+
+---
+
+## Original deferral note (preserved for reference)
 
 **Status:** DEFERRED with trigger. Not a current non-conformance blocker; the
 package builds green and 126 tests pass on the proven per-variant/bridge template.
