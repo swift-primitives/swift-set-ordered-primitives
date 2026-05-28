@@ -29,12 +29,19 @@ extension Set.Ordered where Element: ~Copyable {
     @safe
     public struct Fixed {
         /// Element storage using Buffer.Linear.Bounded from buffer-primitives.
+        ///
+        /// `@usableFromInline internal` ([MOD-036] refined-C): the hot
+        /// `~Copyable`/`Copyable` operation surface co-located in this (type)
+        /// module inlines cross-package to zero-witness-dispatch; the cold
+        /// sequence/collection-family conformances in the ops module reach this
+        /// storage only through the public `span` / `makeIterator` witnesses and
+        /// the `package takeBuffer()` accessor in `Set.Ordered.Fixed+Iteration.swift`.
         @usableFromInline
-        package var buffer: Buffer<Element>.Linear.Bounded
+        internal var buffer: Buffer<Element>.Linear.Bounded
 
         /// Hash table for O(1) position lookup.
         @usableFromInline
-        package var hashTable: Hash.Table<Element>
+        internal var hashTable: Hash.Table<Element>
 
         /// The maximum number of elements the set can hold.
         public let maximumCapacity: Index_Primitives.Index<Element>.Count

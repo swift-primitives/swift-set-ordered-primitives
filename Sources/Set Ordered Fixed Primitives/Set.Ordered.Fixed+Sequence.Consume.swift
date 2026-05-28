@@ -12,15 +12,16 @@
 import Index_Primitives
 import Sequence_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
+public import Set_Ordered_Fixed_Primitive
 public import Buffer_Linear_Bounded_Primitive
 public import Buffer_Linear_Bounded_Primitives
-public import Buffer_Linear_Primitive
 
 // MARK: - consume() Implementation
 //
 // Set.Ordered.Fixed delegates consuming iteration entirely to Buffer.Linear.Bounded.
-// Same swap pattern as Set.Ordered — buffer owns the full pipeline.
+// Same swap pattern as Set.Ordered — buffer owns the full pipeline. The swap reaches
+// storage through the `package` `takeBuffer()` accessor in the type module (no
+// underscored window).
 
 extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
     /// Returns a consuming view: `.consume().forEach { }`
@@ -33,12 +34,9 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
     /// ```
     ///
     /// - Complexity: O(1) to create the view. O(1) per element during iteration.
-    @inlinable
+    // Non-`@inlinable` ([MOD-036] refined-C): cold conformance reaching storage
+    // through the `package` `takeBuffer()` accessor (no underscored window).
     public consuming func consume() -> Sequence.Consume.View<Element, Buffer<Element>.Linear.Bounded.ConsumeState> {
-        var mutableSelf = self
-        mutableSelf.makeUnique()
-        var consumeBuffer = Buffer<Element>.Linear.Bounded(minimumCapacity: .zero)
-        Swift.swap(&mutableSelf.buffer, &consumeBuffer)
-        return consumeBuffer.consume()
+        takeBuffer().consume()
     }
 }
