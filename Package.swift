@@ -86,7 +86,7 @@ let package = Package(
             dependencies: [
                 "Set Ordered Primitive",
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
+                .product(name: "Hash Table Static Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Inline Primitives", package: "swift-buffer-linear-primitives"),
                 // [MOD-036] refined-C: the hot operation surface (insert/remove/
