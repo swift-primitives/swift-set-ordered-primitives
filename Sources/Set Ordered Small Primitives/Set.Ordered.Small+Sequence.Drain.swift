@@ -17,7 +17,7 @@ public import Set_Ordered_Primitive
 // MARK: - Sequence.Drain.Protocol Conformance
 
 extension Set_Primitives.Set.Ordered.Small: Sequence.Drain.`Protocol` {
-    // drain(_ body:) method already exists in Set.Ordered.Small.swift
+    // drain(_ body:) method lives in the type module (Set.Ordered.Small ~Copyable.swift)
 }
 
 // MARK: - Property Accessor

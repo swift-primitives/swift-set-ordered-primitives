@@ -105,6 +105,10 @@ let package = Package(
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitives", package: "swift-buffer-linear-primitives"),
+                // [MOD-036] refined-C: the hot operation surface (insert/remove/
+                // spill-management/iteration witnesses) co-located here imports these.
+                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
+                .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
         ),
 

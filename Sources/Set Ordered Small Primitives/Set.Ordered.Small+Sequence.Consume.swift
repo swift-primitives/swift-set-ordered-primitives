@@ -9,18 +9,18 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Index_Primitives
 import Sequence_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
-public import Buffer_Linear_Primitive
+public import Set_Ordered_Small_Primitive
 public import Buffer_Linear_Small_Primitive
-public import Buffer_Linear_Small_Primitives
+public import Buffer_Linear_Primitive
 
 // MARK: - consume() Implementation
 //
 // Set.Ordered.Small delegates consuming iteration to Buffer.Linear.Small.
-// The composed buffer handles both inline and heap paths internally.
+// The composed buffer handles both inline and heap paths internally. The buffer is
+// reached through the `package` `takeBuffer()` accessor in the type module (no
+// underscored window); returning the buffer destroys the spill-only hash table.
 
 extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Returns a consuming view: `.consume().forEach { }`
@@ -36,10 +36,12 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// ```
     ///
     /// - Complexity: O(n) to create the view (copies inline elements). O(1) per element during iteration.
-    @inlinable
+    // Non-`@inlinable` ([MOD-036] refined-C): cold conformance reaching storage
+    // through the `package` `takeBuffer()` accessor (no underscored window).
+    // `Buffer.Linear.Small.consume()` is `mutating`, so the surrendered buffer is
+    // bound to a `var` before the consume call.
     public consuming func consume() -> Sequence.Consume.View<Element, Buffer<Element>.Linear.Small<inlineCapacity>.ConsumeState> {
-        var mutableSelf = self
-        mutableSelf._heapHashTable = nil
-        return mutableSelf._buffer.consume()
+        var consumeBuffer = takeBuffer()
+        return consumeBuffer.consume()
     }
 }

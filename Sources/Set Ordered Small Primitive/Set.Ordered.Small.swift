@@ -12,7 +12,6 @@
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Small_Primitive
-public import Buffer_Linear_Small_Primitives
 import Hash_Table_Primitives
 import Index_Primitives
 
@@ -28,30 +27,33 @@ extension Set.Ordered where Element: ~Copyable {
     /// Inline mode uses O(n) linear scan — no hash table overhead for small sizes.
     /// Hash table activates only on spill.
     // @frozen lifts the non-frozen partial-consume restriction so the consuming
-    // `Sequenceable.makeIterator()` can extract `_buffer`. ABI-freeze is fine
+    // `Sequenceable.makeIterator()` can extract `buffer`. ABI-freeze is fine
     // pre-1.0 (principal-approved).
     @frozen
     public struct Small<let inlineCapacity: Int>: ~Copyable {
         /// Element cleanup is handled by Storage.Inline's deinit (inline path) or Storage.Heap's deinit (spilled path).
 
-        /// Heap hash table — non-nil after spill.
-        @usableFromInline
-        package var _heapHashTable: Hash.Table<Element>?
-
         /// Element storage — handles inline/heap dispatch internally.
+        ///
+        /// `@usableFromInline internal` ([MOD-036] refined-C): the hot
+        /// `~Copyable`/`Copyable` operation surface co-located in this (type)
+        /// module inlines cross-package to zero-witness-dispatch; the cold
+        /// sequence/collection-family conformances in the ops module reach this
+        /// storage only through the public `span` / `makeIterator` witnesses and
+        /// the `package takeBuffer()` accessor in `Set.Ordered.Small+Iteration.swift`.
         @usableFromInline
-        package var _buffer: Buffer<Element>.Linear.Small<inlineCapacity>
+        internal var buffer: Buffer<Element>.Linear.Small<inlineCapacity>
+
+        /// Hash table — non-nil after spill.
+        @usableFromInline
+        internal var hashTable: Hash.Table<Element>?
 
         /// Creates an empty small ordered set.
         @inlinable
         public init() {
-            self._buffer = Buffer<Element>.Linear.Small<inlineCapacity>()
-            self._heapHashTable = nil
+            self.buffer = Buffer<Element>.Linear.Small<inlineCapacity>()
+            self.hashTable = nil
         }
-
-        /// Whether the set has spilled to heap storage.
-        @inlinable
-        public var isSpilled: Bool { _buffer.isSpilled }
     }
 }
 
