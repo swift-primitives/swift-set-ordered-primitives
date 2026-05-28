@@ -39,8 +39,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// `~Copyable`/`Copyable` operation surface co-located in this (type)
         /// module inlines cross-package to zero-witness-dispatch; the cold
         /// sequence/collection-family conformances in the ops module reach this
-        /// storage only through the public `span` / `makeIterator` witnesses and
-        /// the `package takeBuffer()` accessor in `Set.Ordered.Small+Iteration.swift`.
+        /// storage only through the public `span` / `makeIterator` witnesses.
         @usableFromInline
         internal var buffer: Buffer<Element>.Linear.Small<inlineCapacity>
 

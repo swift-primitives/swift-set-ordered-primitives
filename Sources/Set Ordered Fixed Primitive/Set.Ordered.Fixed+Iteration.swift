@@ -16,16 +16,11 @@ public import Buffer_Linear_Bounded_Primitives
 // MARK: - Iteration accessors ([MOD-036] refined-C)
 //
 // Set.Ordered.Fixed composes Buffer.Linear.Bounded (a complete type with public
-// span / makeIterator / consume), so these delegate to the buffer's public API —
+// span / makeIterator), so these delegate to the buffer's public API —
 // no raw-storage windows. `span` and `makeIterator` import no sequence/collection-
 // primitives, so they co-locate with the storage as plain `public` members; the
 // cold `Memory.Contiguous.Protocol` / `Sequenceable` conformances in the ops module
 // are thin and use them as witnesses (inlinable cross-package).
-//
-// `consume()` is the one ops-bound member (its `Sequence.Consume.View` return type
-// pulls `Sequence_Primitives`, kept out of this lean type module), so it reaches
-// storage through the single `package` accessor below — named, not underscored, and
-// non-`@usableFromInline` since the cold `consume()` is non-`@inlinable`.
 
 extension Set.Ordered.Fixed where Element: Copyable {
 
@@ -40,15 +35,5 @@ extension Set.Ordered.Fixed where Element: Copyable {
     @inlinable
     public consuming func makeIterator() -> Buffer<Element>.Linear.Bounded.Scalar {
         buffer.makeIterator()
-    }
-
-    /// Makes the storage unique and surrenders the backing buffer, leaving the
-    /// consumed `self` empty. Package accessor for the ops-bound `Sequence.Consume`
-    /// conformance (`consume()`).
-    package consuming func takeBuffer() -> Buffer<Element>.Linear.Bounded {
-        makeUnique()
-        var consumeBuffer = Buffer<Element>.Linear.Bounded(minimumCapacity: .zero)
-        Swift.swap(&buffer, &consumeBuffer)
-        return consumeBuffer
     }
 }

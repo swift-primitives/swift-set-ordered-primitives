@@ -339,7 +339,7 @@ struct OrderedSetTests {
         // The type system prevents negative index access at compile time.
     }
 
-    // MARK: - Consuming Iteration (via .consume().forEach pattern)
+    // MARK: - Consuming Iteration (via .consume { } and makeIterator)
 
     @Test
     func `consume().forEach yields all elements`() {
@@ -351,7 +351,7 @@ struct OrderedSetTests {
         set.insert(50)
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -368,7 +368,7 @@ struct OrderedSetTests {
         set.insert(5)
 
         var sum = 0
-        set.consume().forEach { element in
+        set.consume { element in
             sum += element
         }
 
@@ -386,11 +386,11 @@ struct OrderedSetTests {
         let count = set.count
         #expect(count == 4)
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
         var result: [String] = []
         result.reserveCapacity(Int(bitPattern: count))
 
-        while let element = view.next() {
+        while let element = iterator.next() {
             result.append(element)
         }
 
@@ -401,8 +401,8 @@ struct OrderedSetTests {
     func `consume() handles empty set`() {
         let set = Set<Int>.Ordered()
 
-        var view = set.consume()
-        let next = view.next()
+        var iterator = set.makeIterator()
+        let next = iterator.next()
         #expect(next == nil)
     }
 
@@ -414,7 +414,7 @@ struct OrderedSetTests {
         set.insert("bravo")
 
         var result: [String] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -431,7 +431,7 @@ struct OrderedSetTests {
         try set.insert(30)
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -446,7 +446,7 @@ struct OrderedSetTests {
         try set.insert(3)
 
         var sum = 0
-        set.consume().forEach { element in
+        set.consume { element in
             sum += element
         }
 
@@ -462,9 +462,9 @@ struct OrderedSetTests {
         let count = set.count
         #expect(count == 2)
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
         var result: [String] = []
-        while let element = view.next() {
+        while let element = iterator.next() {
             result.append(element)
         }
         #expect(result == ["a", "b"])
@@ -473,8 +473,8 @@ struct OrderedSetTests {
     @Test
     func `Fixed: consume() handles empty set`() throws {
         let set = try Set<Int>.Ordered.Fixed(capacity: 10)
-        var view = set.consume()
-        let next = view.next()
+        var iterator = set.makeIterator()
+        let next = iterator.next()
         #expect(next == nil)
     }
 
@@ -488,7 +488,7 @@ struct OrderedSetTests {
         try set.insert(30)
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -503,7 +503,7 @@ struct OrderedSetTests {
         try set.insert(3)
 
         var sum = 0
-        set.consume().forEach { element in
+        set.consume { element in
             sum += element
         }
 
@@ -519,9 +519,9 @@ struct OrderedSetTests {
         let count = set.count
         #expect(count == 2)
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
         var result: [String] = []
-        while let element = view.next() {
+        while let element = iterator.next() {
             result.append(element)
         }
         #expect(result == ["a", "b"])
@@ -530,8 +530,8 @@ struct OrderedSetTests {
     @Test
     func `Inline: consume() handles empty set`() {
         let set = Set<Int>.Ordered.Static<8>()
-        var view = set.consume()
-        let next = view.next()
+        var iterator = set.makeIterator()
+        let next = iterator.next()
         #expect(next == nil)
     }
 
@@ -545,7 +545,7 @@ struct OrderedSetTests {
         precondition(set.isFull, "Should be at full capacity")
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -563,7 +563,7 @@ struct OrderedSetTests {
         precondition(!set.isSpilled, "Should be in inline mode")
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -580,7 +580,7 @@ struct OrderedSetTests {
         precondition(set.isSpilled, "Should be in heap mode")
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -595,7 +595,7 @@ struct OrderedSetTests {
         set.insert(3)
 
         var sum = 0
-        set.consume().forEach { element in
+        set.consume { element in
             sum += element
         }
 
@@ -611,9 +611,9 @@ struct OrderedSetTests {
         let count = set.count
         #expect(count == 2)
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
         var result: [String] = []
-        while let element = view.next() {
+        while let element = iterator.next() {
             result.append(element)
         }
         #expect(result == ["a", "b"])
@@ -622,8 +622,8 @@ struct OrderedSetTests {
     @Test
     func `Small: consume() handles empty set`() {
         let set = Set<Int>.Ordered.Small<4>()
-        var view = set.consume()
-        let next = view.next()
+        var iterator = set.makeIterator()
+        let next = iterator.next()
         #expect(next == nil)
     }
 
@@ -640,7 +640,7 @@ struct OrderedSetTests {
         precondition(set.isSpilled, "Should be in heap mode after spill")
 
         var result: [Int] = []
-        set.consume().forEach { element in
+        set.consume { element in
             result.append(element)
         }
 
@@ -657,13 +657,13 @@ struct OrderedSetTests {
         set.insert(3)
         set.insert(4)
         set.insert(5)
-        var view = set.consume()
+        var iterator = set.makeIterator()
 
         // Only consume first 2
-        _ = view.next()
-        _ = view.next()
+        _ = iterator.next()
+        _ = iterator.next()
 
-        // View goes out of scope - State's deinit should clean up remaining 3 elements
+        // Iterator goes out of scope - the iterator's deinit should clean up remaining 3 elements
         // If double-free occurred, this would crash
     }
 
@@ -676,13 +676,13 @@ struct OrderedSetTests {
         try set.insert(4)
         try set.insert(5)
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
 
         // Only consume first 2
-        _ = view.next()
-        _ = view.next()
+        _ = iterator.next()
+        _ = iterator.next()
 
-        // View goes out of scope - State's deinit should clean up remaining 3 elements
+        // Iterator goes out of scope - the iterator's deinit should clean up remaining 3 elements
     }
 
     @Test
@@ -694,13 +694,13 @@ struct OrderedSetTests {
         try set.insert(4)
         try set.insert(5)
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
 
         // Only consume first 2
-        _ = view.next()
-        _ = view.next()
+        _ = iterator.next()
+        _ = iterator.next()
 
-        // View goes out of scope - State's deinit should clean up remaining 3 elements
+        // Iterator goes out of scope - the iterator's deinit should clean up remaining 3 elements
     }
 
     @Test
@@ -713,13 +713,13 @@ struct OrderedSetTests {
         set.insert(5)
         precondition(!set.isSpilled, "Should be in inline mode")
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
 
         // Only consume first 2
-        _ = view.next()
-        _ = view.next()
+        _ = iterator.next()
+        _ = iterator.next()
 
-        // View goes out of scope - State's deinit should clean up remaining 3 elements
+        // Iterator goes out of scope - the iterator's deinit should clean up remaining 3 elements
     }
 
     @Test
@@ -732,12 +732,12 @@ struct OrderedSetTests {
         set.insert(5)
         precondition(set.isSpilled, "Should be in heap mode")
 
-        var view = set.consume()
+        var iterator = set.makeIterator()
 
         // Only consume first 2
-        _ = view.next()
-        _ = view.next()
+        _ = iterator.next()
+        _ = iterator.next()
 
-        // View goes out of scope - State's deinit should clean up remaining 3 elements
+        // Iterator goes out of scope - the iterator's deinit should clean up remaining 3 elements
     }
 }
