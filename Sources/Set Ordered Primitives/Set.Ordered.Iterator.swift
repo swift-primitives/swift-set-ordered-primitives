@@ -43,13 +43,9 @@ public import Buffer_Linear_Primitives
 // Memory.Contiguous.Protocol exposes the insertion-ordered span so the
 // memory→Iterable bridge can vend `Iterator.Chunk`. `withUnsafeBufferPointer`
 // is provided in Set.Ordered ~Copyable.swift (same module).
-extension Set.Ordered: Memory.Contiguous.`Protocol` where Element: Copyable {
-    public var span: Swift.Span<Element> {
-        @_lifetime(borrow self)
-        @inlinable
-        borrowing get { _span }
-    }
-}
+// Witnesses (`span`, `withUnsafeBufferPointer`) are public members in the type
+// module; this conformance is thin ([MOD-036] refined-C).
+extension Set.Ordered: Memory.Contiguous.`Protocol` where Element: Copyable {}
 
 extension Set.Ordered: Iterable where Element: Copyable {
     @_implements(Iterable, Iterator)
@@ -60,10 +56,8 @@ extension Set.Ordered: Sequenceable where Element: Copyable {
     @_implements(Sequenceable, Iterator)
     public typealias SequenceableIterator = Buffer<Element>.Linear.Scalar
 
-    @inlinable
-    public consuming func makeIterator() -> Buffer<Element>.Linear.Scalar {
-        _makeScalar()
-    }
+    // `makeIterator()` witness is a public member in the type module
+    // ([MOD-036] refined-C); this conformance is thin.
 
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable

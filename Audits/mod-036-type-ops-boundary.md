@@ -13,20 +13,44 @@ its own per-variant surgery — they are NOT pure mechanical mirrors of base:
 - **Small**: adds spill state (`_heapHashTable: Hash.Table?`, `isSpilled`) over
   `_buffer: Buffer.Linear.Small<inlineCapacity>` — most divergent.
 
-**Base-variant recipe applied (the template for the satellites):**
-1. storage `@usableFromInline package` → `@usableFromInline internal`;
+**Base-variant recipe (CORRECTED — the clean template for the satellites and the
+fan-out). NO underscored windows; NO Copyable/~Copyable target split** (supervisor
+decision: for set-ordered the Copyable partition coincides with type/ops, and a
+target split only re-opens the MOD-036 inlining problem — not worth ×4×16 target
+proliferation for a thin Copyable surface):
+
+1. storage `@usableFromInline package` → `@usableFromInline internal` (hot
+   `@inlinable` ops inline cross-package through it; NOT `package` — the hot
+   `@inlinable` ops reference storage and `@inlinable` bodies cannot reference
+   `package` symbols, [MOD-036]/[MOD-027]).
 2. hot internal-touching ops (Copyable/~Copyable methods, Algebra, Indexed,
-   Builder) + Hash.Protocol move into the `{…} Primitive` (type) module;
-3. cold seq/coll-family conformances (Memory.Contiguous, Sequenceable,
-   Sequence.Consume) stay in the ops module behind `package` windows
-   (`_span`/`_makeScalar`/`_takeBuffer`) in `…+ConformanceSupport.swift`;
-4. ExpressibleByArrayLiteral / Set.Protocol / Sequence.Clearable split to own ops
-   files; Iterator/conformance file opts into `@_spi(Unsafe)` per [MOD-016] for
-   the moved `withUnsafeBufferPointer` witness;
-5. type target gains Cardinal/Ordinal product deps.
+   Builder) + Hash.Protocol move into the `{…} Primitive` (type) module.
+3. **Witnesses that import no sequence/collection-primitives are plain `public`
+   members co-located with storage in the type module** — NOT windows. Because
+   set-ordered *composes* `Buffer.Linear` (public `span`/`makeIterator`/`consume`),
+   these just delegate: `Set.Ordered+Iteration.swift` declares `public var span`
+   and `public consuming func makeIterator()` (both `@inlinable`, inline
+   cross-package). The cold `Memory.Contiguous` / `Sequenceable` conformances in
+   the ops module are then **thin** (empty / typealias-only) and use those public
+   witnesses.
+4. The ONE ops-bound member is `consume()` — its `Sequence.Consume.View` return
+   type pulls `Sequence_Primitives`, kept out of the lean type module. It is
+   **non-`@inlinable`** (cold) and reaches storage through a SINGLE named
+   `package consuming func takeBuffer()` in the type module (`+Iteration.swift`) —
+   named, not underscored, non-`@usableFromInline`.
+5. ExpressibleByArrayLiteral / Set.Protocol / Sequence.Clearable split to own ops
+   files; the Memory.Contiguous conformance file opts into `@_spi(Unsafe)` per
+   [MOD-016] for the `withUnsafeBufferPointer` witness moved to the type module.
+6. type target gains Cardinal/Ordinal product deps.
 
 Iteration-conformance shape left UNCHANGED (Track 3, supervisor-gated): only the
 storage-access path of the cold conformances changed, not the conformance set.
+
+(Superseded shape: an earlier base commit used underscored `package` windows
+`_span`/`_makeScalar`/`_takeBuffer` in a `+ConformanceSupport.swift`, mirroring
+buffer-linear's raw-storage-owner pattern. That over-applied — set-ordered
+composes Buffer.Linear rather than owning raw `Storage.Heap`, so it delegates to
+the buffer's public API. Reworked to the windowless shape above.)
 
 ---
 

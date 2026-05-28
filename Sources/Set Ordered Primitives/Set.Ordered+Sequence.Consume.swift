@@ -42,8 +42,9 @@ extension Set_Primitives.Set.Ordered where Element: Copyable {
     /// ```
     ///
     /// - Complexity: O(1) to create the view. O(1) per element during iteration.
-    @inlinable
+    // Non-`@inlinable` ([MOD-036] refined-C): cold conformance reaching storage
+    // through the `package` `takeBuffer()` accessor (no underscored window).
     public consuming func consume() -> Sequence.Consume.View<Element, Buffer<Element>.Linear.ConsumeState> {
-        _takeBuffer().consume()
+        takeBuffer().consume()
     }
 }
