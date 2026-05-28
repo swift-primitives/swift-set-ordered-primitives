@@ -22,7 +22,7 @@ import Buffer_Linear_Bounded_Primitives
 
 // MARK: - Properties
 
-extension Set_Primitives.Set.Ordered.Fixed {
+extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
     /// The number of elements in the set.
     @inlinable
     public var count: Index<Element>.Count { buffer.count }
@@ -42,7 +42,7 @@ extension Set_Primitives.Set.Ordered.Fixed {
 
 // MARK: - Borrowed Element Access
 
-extension Set_Primitives.Set.Ordered.Fixed {
+extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
     /// Accesses the element at the given index via closure.
     @inlinable
     public func withElement<R>(at index: Index<Element>, _ body: (borrowing Element) -> R) -> R {
@@ -97,7 +97,7 @@ extension Set_Primitives.Set.Ordered.Fixed {
 
 // MARK: - Span Access
 
-extension Set_Primitives.Set.Ordered.Fixed {
+extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
     /// Provides read-only span access to the set's elements in insertion order.
     @inlinable
     public func withSpan<R, E: Swift.Error>(
@@ -123,7 +123,7 @@ extension Set_Primitives.Set.Ordered.Fixed {
 // MARK: - Buffer Access (Escape Hatch for C Interop)
 
 @_spi(Unsafe)
-extension Set_Primitives.Set.Ordered.Fixed {
+extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
     /// Provides read-only access to the underlying contiguous storage.
     @unsafe
     @inlinable

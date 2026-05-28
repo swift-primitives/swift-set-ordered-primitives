@@ -34,7 +34,7 @@ import Buffer_Linear_Primitive
 
 // MARK: - Properties
 
-extension Set_Primitives.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static where Element: ~Copyable {
     /// The number of elements in the set.
     @inlinable
     public var count: Index<Element>.Count { buffer.count }
@@ -50,7 +50,7 @@ extension Set_Primitives.Set.Ordered.Static {
 
 // MARK: - Core Operations
 
-extension Set_Primitives.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static where Element: ~Copyable {
     /// Returns the bounded index of the given element, or `nil` if not present.
     ///
     /// The returned index is guaranteed to be in [0, capacity).
@@ -140,8 +140,11 @@ extension Set_Primitives.Set.Ordered.Static {
     }
 
     /// Removes all elements from the set.
+    ///
+    /// Requires `Element: Copyable` because the inline buffer's bulk `removeAll()`
+    /// does; `~Copyable` elements are emptied via the consuming `drain(_:)`.
     @inlinable
-    public mutating func clear() {
+    public mutating func clear() where Element: Copyable {
         guard hashTable.count > .zero else { return }
         buffer.removeAll()
         hashTable.remove.all()
@@ -149,8 +152,11 @@ extension Set_Primitives.Set.Ordered.Static {
 }
 
 // MARK: - Element Access
+//
+// These accessors return `Element` by value, so they require `Element: Copyable`.
+// `~Copyable` elements use the borrowing `withElement(at:)` / `forEach` surface.
 
-extension Set_Primitives.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static where Element: Copyable {
     /// Accesses the element at the specified index.
     @inlinable
     public func element(at index: Index<Element>) throws(__SetOrderedInlineError<Element>) -> Element {
@@ -195,7 +201,7 @@ extension Set_Primitives.Set.Ordered.Static {
 
 // MARK: - First/Last Accessors
 
-extension Set_Primitives.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static where Element: Copyable {
     /// The first element, or `nil` if the set is empty.
     @inlinable
     public var first: Element? {
@@ -213,7 +219,7 @@ extension Set_Primitives.Set.Ordered.Static {
 
 // MARK: - Borrowed Element Access
 
-extension Set_Primitives.Set.Ordered.Static {
+extension Set_Primitives.Set.Ordered.Static where Element: ~Copyable {
     /// Accesses the element at the given index via closure.
     @inlinable
     public func withElement<R>(at index: Index<Element>, _ body: (borrowing Element) -> R) -> R {

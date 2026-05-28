@@ -32,7 +32,7 @@ public import Buffer_Linear_Small_Primitive
 
 // MARK: - Spill State
 
-extension Set.Ordered.Small {
+extension Set.Ordered.Small where Element: ~Copyable {
     /// Whether the set has spilled to heap storage.
     @inlinable
     public var isSpilled: Bool { buffer.isSpilled }
@@ -40,7 +40,7 @@ extension Set.Ordered.Small {
 
 // MARK: - Properties
 
-extension Set_Primitives.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     /// The number of elements in the set.
     @inlinable
     public var count: Index<Element>.Count {
@@ -59,6 +59,13 @@ extension Set_Primitives.Set.Ordered.Small {
 }
 
 // MARK: - Borrowed Element Access
+//
+// NOTE: held at `Element: Copyable` (bare). `withElement`/`contains`/`forEach` are
+// `~Copyable`-safe, but `drain()` in this group cannot go `~Copyable`: emptying the
+// optional `~Copyable` `hashTable` in place crashes DiagnoseStaticExclusivity
+// (`hashTable?.`/`hashTable!.remove.all()`), and the take-and-put-back workaround
+// hits the `~Copyable` "partial reinitialize after consume" rule. Needs a structural
+// redesign (resolve in the unified iteration rework) — see the handoff.
 
 extension Set_Primitives.Set.Ordered.Small {
     /// Accesses the element at the given index via closure.
@@ -138,7 +145,7 @@ extension Set_Primitives.Set.Ordered.Small {
 
 // MARK: - Span Access (Closure-Based)
 
-extension Set_Primitives.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     /// Safe, bounds-checked read access to contiguous storage via closure.
     ///
     /// Small sets use closure-based access because inline storage mode requires
