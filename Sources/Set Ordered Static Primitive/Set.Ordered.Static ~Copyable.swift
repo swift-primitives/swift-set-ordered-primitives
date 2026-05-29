@@ -66,11 +66,13 @@ extension Set_Primitives.Set.Ordered.Static where Element: ~Copyable {
     /// - Complexity: O(1) average, O(n) worst case.
     @inlinable
     public func contains(_ element: borrowing Element) -> Bool {
-        hashTable.position(
+        // Concrete Set.Protocol witness delegating over the shared
+        // Hash.Table.Protocol membership terminal (`position(...) != nil`).
+        hashTable.contains(
             forHash: element.hashValue,
             context: element,
             equals: { idx, elem in buffer[idx] == elem }
-        ) != nil
+        )
     }
 
     /// Inserts an element into the set.

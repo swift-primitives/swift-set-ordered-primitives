@@ -87,14 +87,15 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     @inlinable
     public func contains(_ element: borrowing Element) -> Bool {
         if isSpilled {
-            // Borrowing optional-chaining: probe the optional `~Copyable` hash table
-            // without extracting it. (The old `let ht = hashTable!` forced a copy,
-            // gating this op to `Copyable`.) Spilled ⟹ `hashTable` is non-nil.
-            return hashTable?.position(
+            // Borrowing optional-chaining over the shared Hash.Table.Protocol membership
+            // terminal — probes the optional `~Copyable` hash table without extracting it.
+            // (The old `let ht = hashTable!` forced a copy, gating this op to `Copyable`.)
+            // Spilled ⟹ `hashTable` is non-nil, so the `?? false` fallback is unreached.
+            return hashTable?.contains(
                 forHash: element.hashValue,
                 context: element,
                 equals: { idx, elem in buffer[idx] == elem }
-            ) != nil
+            ) ?? false
         } else {
             var idx: Index<Element> = .zero
             let end = buffer.count.map(Ordinal.init)
