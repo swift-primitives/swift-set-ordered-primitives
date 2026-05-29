@@ -41,11 +41,11 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
-        // Relocated algebra re-export ([MOD-032]/[MOD-033]): the set algebra
-        // lifted out of swift-set-primitives' umbrella into this sibling; the
-        // umbrella below deps + re-exports it so Set.Ordered.union/etc. stay
-        // visible to consumers. Downward edge — no cycle.
-        .package(url: "https://github.com/swift-primitives/swift-set-algebra-primitives.git", branch: "main"),
+        // NOTE: swift-set-algebra-primitives is intentionally NOT a dependency of
+        // this package (library OR tests). The ordered-set discipline and the set
+        // algebra are orthogonal, mutually-independent concerns (set-builder ⊥
+        // set-algebra ⊥ set-ordered); algebra is tested in its own package against
+        // a buildable fixture, and composed at the consumer (import both packages).
         .package(url: "https://github.com/swift-primitives/swift-property-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-ordinal-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-cardinal-primitives.git", branch: "main"),
@@ -180,10 +180,9 @@ let package = Package(
                 "Set Ordered Fixed Primitives",
                 "Set Ordered Static Primitives",
                 "Set Ordered Small Primitives",
-                // Relocated set-algebra re-export ([MOD-032]/[MOD-033]) — the
-                // umbrella carries the algebra so Set.Ordered.union/isDisjoint/…
-                // stay visible to set-ordered's consumers + tests.
-                .product(name: "Set Algebra Primitives", package: "swift-set-algebra-primitives"),
+                // NOTE: set algebra is intentionally NOT a dependency of the
+                // ordered-set library. Algebra is composed at the consumer
+                // (import Set_Ordered_Primitives + Set_Algebra_Primitives).
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),

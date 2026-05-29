@@ -20,7 +20,8 @@
 @_exported public import Set_Ordered_Fixed_Primitives
 @_exported public import Set_Ordered_Static_Primitives
 @_exported public import Set_Ordered_Small_Primitives
-// Relocated from swift-set-primitives' umbrella ([MOD-032]/[MOD-033]): the set
-// algebra (predicates + constructive) now lands here, so `Set.Ordered.union`,
-// `.isDisjoint`, etc. stay visible to consumers of this package.
-@_exported public import Set_Algebra_Primitives
+// NOTE: set algebra is NOT re-exported here. The ordered-set discipline and the
+// set algebra are orthogonal concerns composed at the consumer: a consumer that
+// wants algebra over Set.Ordered imports BOTH `Set_Ordered_Primitives` and
+// `Set_Algebra_Primitives` (the algebra is a protocol-extension layer over
+// `Set.Protocol`, so it applies to Set.Ordered on import). Minimal deps + composition.
