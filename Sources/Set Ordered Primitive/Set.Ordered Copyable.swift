@@ -213,34 +213,18 @@ extension Set.Ordered where Element: Copyable {
 // ============================================================================
 
 extension Set.Ordered: Hash.`Protocol` {
-    /// Compares two ordered sets for element-wise equality.
+    /// Compares two ordered sets for element-wise equality, over the span
+    /// (`Span: Equation.Protocol`, equation-primitives Standard Library Integration).
     @inlinable
     public static func == (lhs: borrowing Self, rhs: borrowing Self) -> Bool {
-        guard lhs.count == rhs.count else { return false }
-        let count = lhs.count
-        guard count > .zero else { return true }
-        var index: Index<Element> = .zero
-        let end = count.map(Ordinal.init)
-        while index < end {
-            if lhs.buffer[index] != rhs.buffer[index] {
-                return false
-            }
-            index += .one
-        }
-        return true
+        lhs.span == rhs.span
     }
 
-    /// Hashes the essential components of this set.
+    /// Hashes the count and elements of this set, over the span
+    /// (`Span: Hash.Protocol`, hash-primitives Standard Library Integration).
     @inlinable
     public borrowing func hash(into hasher: inout Hasher) {
-        hasher.combine(count)
-        guard count > .zero else { return }
-        var index: Index<Element> = .zero
-        let end = count.map(Ordinal.init)
-        while index < end {
-            buffer[index].hash(into: &hasher)
-            index += .one
-        }
+        span.hash(into: &hasher)
     }
 }
 
