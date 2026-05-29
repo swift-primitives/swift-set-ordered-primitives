@@ -20,3 +20,7 @@
 @_exported public import Set_Ordered_Fixed_Primitives
 @_exported public import Set_Ordered_Static_Primitives
 @_exported public import Set_Ordered_Small_Primitives
+// Relocated from swift-set-primitives' umbrella ([MOD-032]/[MOD-033]): the set
+// algebra (predicates + constructive) now lands here, so `Set.Ordered.union`,
+// `.isDisjoint`, etc. stay visible to consumers of this package.
+@_exported public import Set_Algebra_Primitives

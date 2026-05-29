@@ -41,6 +41,11 @@ let package = Package(
         .package(path: "../swift-buffer-linear-primitives"),
         .package(path: "../swift-sequence-primitives"),
         .package(path: "../swift-iterator-primitives"),
+        // Relocated algebra re-export ([MOD-032]/[MOD-033]): the set algebra
+        // lifted out of swift-set-primitives' umbrella into this sibling; the
+        // umbrella below deps + re-exports it so Set.Ordered.union/etc. stay
+        // visible to consumers. Downward edge — no cycle.
+        .package(path: "../swift-set-algebra-primitives"),
         .package(path: "../swift-property-primitives"),
         .package(path: "../swift-ordinal-primitives"),
         .package(path: "../swift-cardinal-primitives"),
@@ -175,6 +180,10 @@ let package = Package(
                 "Set Ordered Fixed Primitives",
                 "Set Ordered Static Primitives",
                 "Set Ordered Small Primitives",
+                // Relocated set-algebra re-export ([MOD-032]/[MOD-033]) — the
+                // umbrella carries the algebra so Set.Ordered.union/isDisjoint/…
+                // stay visible to set-ordered's consumers + tests.
+                .product(name: "Set Algebra Primitives", package: "swift-set-algebra-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
