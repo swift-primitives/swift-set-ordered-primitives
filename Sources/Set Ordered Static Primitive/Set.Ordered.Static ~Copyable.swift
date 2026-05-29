@@ -39,10 +39,6 @@ extension Set_Primitives.Set.Ordered.Static where Element: ~Copyable {
     @inlinable
     public var count: Index<Element>.Count { buffer.count }
 
-    /// Whether the set is empty.
-    @inlinable
-    public var isEmpty: Bool { hashTable.isEmpty }
-
     /// Whether the set is at full capacity.
     @inlinable
     public var isFull: Bool { hashTable.isFull }

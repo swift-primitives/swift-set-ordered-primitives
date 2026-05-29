@@ -10,12 +10,13 @@
 // ===----------------------------------------------------------------------===//
 
 public import Set_Primitives
-public import Set_Ordered_Small_Primitive
 
 // MARK: - Set.Protocol Conformance
 //
-// Kept in the ops module ([MOD-036] refined-C): `Set.Protocol` (`__SetProtocol`)
-// composes the sequence/collection-family surface declared in this module, so the
-// conformance is declared where those requirements are visible.
+// Co-located with the type and its hot witnesses ([MOD-036] refined-C): the
+// reduced `Set.Protocol` core (`__SetProtocol`) requires only `{contains, count}`
+// — both declared in this (type) module — so the membership conformance lives
+// here, not in the ops module. This makes the derived `isEmpty` default
+// (`count == .zero`) available wherever the type itself is imported.
 
-extension Set.Ordered.Small: Set.`Protocol` {}
+extension Set.Ordered: Set.`Protocol` where Element: ~Copyable {}

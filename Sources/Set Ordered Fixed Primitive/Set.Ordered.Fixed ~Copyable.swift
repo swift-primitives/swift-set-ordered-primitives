@@ -27,10 +27,6 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
     @inlinable
     public var count: Index<Element>.Count { buffer.count }
 
-    /// Whether the set is empty.
-    @inlinable
-    public var isEmpty: Bool { buffer.isEmpty }
-
     /// Whether the set is at full capacity.
     @inlinable
     public var isFull: Bool { buffer.count >= maximumCapacity }

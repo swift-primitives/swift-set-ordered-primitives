@@ -25,10 +25,6 @@ extension Set.Ordered where Element: ~Copyable {
     @inlinable
     public var count: Index<Element>.Count { buffer.count }
 
-    /// Whether the set is empty.
-    @inlinable
-    public var isEmpty: Bool { buffer.isEmpty }
-
     /// The current capacity of the set.
     @inlinable
     public var capacity: Index<Element>.Count { buffer.capacity }

@@ -47,10 +47,6 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
         buffer.count
     }
 
-    /// Whether the set is empty.
-    @inlinable
-    public var isEmpty: Bool { count == .zero }
-
     /// The current capacity of the set.
     @inlinable
     public var capacity: Index<Element>.Count {
@@ -58,16 +54,16 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     }
 }
 
-// MARK: - Borrowed Element Access
+// MARK: - Borrowed Element Access (~Copyable-safe read surface)
 //
-// NOTE: held at `Element: Copyable` (bare). `withElement`/`contains`/`forEach` are
-// `~Copyable`-safe, but `drain()` in this group cannot go `~Copyable`: emptying the
-// optional `~Copyable` `hashTable` in place crashes DiagnoseStaticExclusivity
-// (`hashTable?.`/`hashTable!.remove.all()`), and the take-and-put-back workaround
-// hits the `~Copyable` "partial reinitialize after consume" rule. Needs a structural
-// redesign (resolve in the unified iteration rework) — see the handoff.
+// `withElement`/`contains`/`forEach` only BORROW the storage, so they are
+// `~Copyable`-safe. `contains` reads the optional `~Copyable` `hashTable` via
+// borrowing optional-chaining (`hashTable?.position(...)`) — no extraction — so it no
+// longer requires `Copyable` (the prior `let ht = hashTable!` forced a copy, which is
+// what gated this whole group). Only the *mutating* `drain()` stays `Copyable`-gated
+// (below) — the B2 hazard, surfaced not fixed.
 
-extension Set_Primitives.Set.Ordered.Small {
+extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     /// Accesses the element at the given index via closure.
     @inlinable
     public func withElement<R>(at index: Index<Element>, _ body: (borrowing Element) -> R) -> R {
@@ -91,8 +87,10 @@ extension Set_Primitives.Set.Ordered.Small {
     @inlinable
     public func contains(_ element: borrowing Element) -> Bool {
         if isSpilled {
-            let ht = hashTable!
-            return ht.position(
+            // Borrowing optional-chaining: probe the optional `~Copyable` hash table
+            // without extracting it. (The old `let ht = hashTable!` forced a copy,
+            // gating this op to `Copyable`.) Spilled ⟹ `hashTable` is non-nil.
+            return hashTable?.position(
                 forHash: element.hashValue,
                 context: element,
                 equals: { idx, elem in buffer[idx] == elem }
@@ -120,7 +118,16 @@ extension Set_Primitives.Set.Ordered.Small {
             index += .one
         }
     }
+}
 
+// MARK: - Drain (Copyable-gated — B2 hazard, mutating)
+//
+// `drain()` must stay `Copyable`-gated: emptying the optional `~Copyable` `hashTable`
+// in place crashes DiagnoseStaticExclusivity, and the take-and-put-back workaround
+// hits the `~Copyable` "partial reinitialize after consume" rule. Structural redesign
+// deferred to the unified iteration rework (B2 hazard — surfaced, not fixed here).
+
+extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Removes and consumes all elements.
     // on buffer.remove loop + hashTable operations in deep @inlinable chain.
     @inlinable
