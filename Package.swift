@@ -32,24 +32,24 @@ let package = Package(
         .library(name: "Set Ordered Primitives Test Support", targets: ["Set Ordered Primitives Test Support"]),
     ],
     dependencies: [
-        .package(path: "../swift-set-primitives"),
-        .package(path: "../swift-bit-primitives"),
-        .package(path: "../swift-index-primitives"),
-        .package(path: "../swift-hash-table-primitives"),
-        .package(path: "../swift-hash-primitives"),
-        .package(path: "../swift-buffer-primitives"),
-        .package(path: "../swift-buffer-linear-primitives"),
-        .package(path: "../swift-sequence-primitives"),
-        .package(path: "../swift-iterator-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-set-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-bit-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-hash-table-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-hash-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
         // Relocated algebra re-export ([MOD-032]/[MOD-033]): the set algebra
         // lifted out of swift-set-primitives' umbrella into this sibling; the
         // umbrella below deps + re-exports it so Set.Ordered.union/etc. stay
         // visible to consumers. Downward edge — no cycle.
-        .package(path: "../swift-set-algebra-primitives"),
-        .package(path: "../swift-property-primitives"),
-        .package(path: "../swift-ordinal-primitives"),
-        .package(path: "../swift-cardinal-primitives"),
-        .package(path: "../swift-finite-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-set-algebra-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-property-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-ordinal-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-cardinal-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-finite-primitives.git", branch: "main"),
     ],
     targets: [
 
