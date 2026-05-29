@@ -25,10 +25,10 @@ var required: Set<String>.Ordered = .init()
 required.insert("logging")
 required.insert("security")
 
-let active = plugins.algebra.union(required)
+let active = plugins.union(required)
 // active: ["analytics", "logging", "security"]
 
-let missing = required.algebra.subtract(plugins)
+let missing = required.subtracting(plugins)
 // missing: ["security"]
 
 // Result builder — control-flow support, duplicates collapsed.

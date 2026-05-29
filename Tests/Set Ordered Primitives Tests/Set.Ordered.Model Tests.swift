@@ -260,7 +260,7 @@ struct OrderedSetModelTests {
             modelB.insert(valueB)
         }
 
-        let union = setA.algebra.union(setB)
+        let union = setA.union(setB)
 
         // Model union: all from A, then new from B
         var modelUnion = modelA
@@ -287,7 +287,7 @@ struct OrderedSetModelTests {
             setB.insert(rng.nextInt(50))
         }
 
-        let intersection = setA.algebra.intersection(setB)
+        let intersection = setA.intersection(setB)
 
         // Model: elements in A that are also in B, maintaining A's order
         let arrayA = toArray(setA)
@@ -309,7 +309,7 @@ struct OrderedSetModelTests {
             setB.insert(rng.nextInt(50))
         }
 
-        let difference = setA.algebra.subtract(setB)
+        let difference = setA.subtracting(setB)
 
         let arrayA = toArray(setA)
         let modelDifference = arrayA.filter { !setB.contains($0) }
@@ -330,7 +330,7 @@ struct OrderedSetModelTests {
             setB.insert(rng.nextInt(50))
         }
 
-        let symmetric = setA.algebra.symmetric.difference(setB)
+        let symmetric = setA.symmetricDifference(setB)
 
         // Model: (A - B) union (B - A), with A's elements first
         let arrayA = toArray(setA)
@@ -417,19 +417,19 @@ struct OrderedSetModelTests {
             setB.insert(i)
         }
 
-        let union = setA.algebra.union(setB)
+        let union = setA.union(setB)
         let unionCount = union.count
         #expect(unionCount == 1500, "Union should have 1500 elements (0-1499)")
 
-        let intersection = setA.algebra.intersection(setB)
+        let intersection = setA.intersection(setB)
         let intersectionCount = intersection.count
         #expect(intersectionCount == 500, "Intersection should have 500 elements (500-999)")
 
-        let difference = setA.algebra.subtract(setB)
+        let difference = setA.subtracting(setB)
         let differenceCount = difference.count
         #expect(differenceCount == 500, "Difference should have 500 elements (0-499)")
 
-        let symmetric = setA.algebra.symmetric.difference(setB)
+        let symmetric = setA.symmetricDifference(setB)
         let symmetricCount = symmetric.count
         #expect(symmetricCount == 1000, "Symmetric difference should have 1000 elements (0-499 and 1000-1499)")
     }
@@ -445,22 +445,22 @@ struct OrderedSetModelTests {
         nonEmpty.insert(3)
 
         // Union with empty
-        let unionEmptyFirst = toArray(empty.algebra.union(nonEmpty))
-        let unionEmptySecond = toArray(nonEmpty.algebra.union(empty))
+        let unionEmptyFirst = toArray(empty.union(nonEmpty))
+        let unionEmptySecond = toArray(nonEmpty.union(empty))
         #expect(unionEmptyFirst == [1, 2, 3], "Union with empty (empty first)")
         #expect(unionEmptySecond == [1, 2, 3], "Union with empty (empty second)")
 
         // Intersection with empty
-        let intersectionEmpty = empty.algebra.intersection(nonEmpty)
-        let intersectionNonEmpty = nonEmpty.algebra.intersection(empty)
+        let intersectionEmpty = empty.intersection(nonEmpty)
+        let intersectionNonEmpty = nonEmpty.intersection(empty)
         let intersectionEmptyIsEmpty = intersectionEmpty.isEmpty
         let intersectionNonEmptyIsEmpty = intersectionNonEmpty.isEmpty
         #expect(intersectionEmptyIsEmpty, "Intersection with empty should be empty")
         #expect(intersectionNonEmptyIsEmpty, "Intersection with empty should be empty")
 
         // Subtract empty
-        let subtractEmpty = toArray(nonEmpty.algebra.subtract(empty))
-        let subtractFromEmpty = empty.algebra.subtract(nonEmpty)
+        let subtractEmpty = toArray(nonEmpty.subtracting(empty))
+        let subtractFromEmpty = empty.subtracting(nonEmpty)
         let subtractFromEmptyIsEmpty = subtractFromEmpty.isEmpty
         #expect(subtractEmpty == [1, 2, 3], "Subtract empty should preserve elements")
         #expect(subtractFromEmptyIsEmpty, "Subtract from empty should be empty")

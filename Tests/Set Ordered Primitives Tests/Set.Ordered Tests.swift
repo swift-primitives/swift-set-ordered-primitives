@@ -16,8 +16,9 @@ import Testing
 
 // MARK: - Helper to convert Set.Ordered to Array
 
-func toArray<Element: Hashable>(_ set: borrowing Set<Element>.Ordered) -> [Element] {
-    var result: [Element] = []
+func toArray<S: Iterable & ~Copyable>(_ set: borrowing S) -> [S.Iterator.Element]
+where S.Iterator.Element: Hashable, S.Iterator.Failure == Never {
+    var result: [S.Iterator.Element] = []
     set.forEach { result.append($0) }
     return result
 }
@@ -150,7 +151,7 @@ struct OrderedSetTests {
         b.insert(4)
         b.insert(5)
 
-        let result = a.algebra.union(b)
+        let result = a.union(b)
         let array = toArray(result)
         #expect(array == [1, 2, 3, 4, 5])
     }
@@ -167,7 +168,7 @@ struct OrderedSetTests {
         b.insert(4)
         b.insert(6)
 
-        let result = a.algebra.intersection(b)
+        let result = a.intersection(b)
         let array = toArray(result)
         #expect(array == [2, 4])
     }
@@ -184,7 +185,7 @@ struct OrderedSetTests {
         b.insert(2)
         b.insert(4)
 
-        let result = a.algebra.subtract(b)
+        let result = a.subtracting(b)
         let array = toArray(result)
         #expect(array == [1, 3, 5])
     }
@@ -200,7 +201,7 @@ struct OrderedSetTests {
         b.insert(3)
         b.insert(4)
 
-        let result = a.algebra.symmetric.difference(b)
+        let result = a.symmetricDifference(b)
         let array = toArray(result)
         #expect(array == [1, 4])
     }

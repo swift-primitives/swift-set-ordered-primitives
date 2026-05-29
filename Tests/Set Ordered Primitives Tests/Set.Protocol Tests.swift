@@ -327,7 +327,7 @@ struct SetProtocolTests {
         var b = Set<Int>.Ordered()
         b.insert(2)
         b.insert(4)
-        let result = a.subtract(b)
+        let result = a.subtracting(b)
         #expect(toArray(result) == [1, 3, 5])
     }
 
@@ -356,8 +356,8 @@ struct SetProtocolTests {
         #expect(toArray(nonEmpty.union(empty)) == [1, 2])
         #expect(toArray(empty.intersection(nonEmpty)) == [])
         #expect(toArray(nonEmpty.intersection(empty)) == [])
-        #expect(toArray(nonEmpty.subtract(empty)) == [1, 2])
-        #expect(toArray(empty.subtract(nonEmpty)) == [])
+        #expect(toArray(nonEmpty.subtracting(empty)) == [1, 2])
+        #expect(toArray(empty.subtracting(nonEmpty)) == [])
         #expect(toArray(empty.symmetricDifference(nonEmpty)) == [1, 2])
     }
 
@@ -396,19 +396,22 @@ struct SetProtocolTests {
     }
 
     @Test
-    func `Fixed union with Small`() throws {
+    func `Small union with Fixed`() throws {
         var fixed = try Set<Int>.Ordered.Fixed(capacity: 4)
         try fixed.insert(1)
         try fixed.insert(2)
         var small = Set<Int>.Ordered.Small<4>()
         small.insert(3)
         small.insert(4)
-        let result = fixed.union(small)
-        #expect(toArray(result) == [1, 2, 3, 4])
+        // Constructive ops require a growable (`Set.Buildable.Protocol`)
+        // receiver; `Small` is growable, `Fixed` is the bounded `Other`. Result
+        // is `Self` (Small), receiver-first in iteration order.
+        let result = small.union(fixed)
+        #expect(toArray(result) == [3, 4, 1, 2])
     }
 
     @Test
-    func `Static intersection with Ordered`() throws {
+    func `Ordered intersection with Static`() throws {
         var _static = Set<Int>.Ordered.Static<8>()
         try _static.insert(1)
         try _static.insert(2)
@@ -417,7 +420,10 @@ struct SetProtocolTests {
         ordered.insert(2)
         ordered.insert(3)
         ordered.insert(4)
-        let result = _static.intersection(ordered)
+        // Growable receiver (`Ordered`) intersect bounded `Other` (`Static`);
+        // bounded variants are not `BuildableSet`, so they cannot originate a
+        // `Self`-returning constructive op (model §4.2).
+        let result = ordered.intersection(_static)
         #expect(toArray(result) == [2, 3])
     }
 
@@ -431,7 +437,7 @@ struct SetProtocolTests {
         var ordered = Set<Int>.Ordered()
         ordered.insert(2)
         ordered.insert(4)
-        let result = small.subtract(ordered)
+        let result = small.subtracting(ordered)
         #expect(toArray(result) == [1, 3])
     }
 
@@ -509,12 +515,17 @@ struct SetProtocolTests {
         #expect(!disjoint)
     }
 
+    // Bounded variants (`Fixed`/`Static`) are NOT `Set.Buildable.Protocol`, so
+    // they cannot ORIGINATE a `Self`-returning constructive op (model §4.2).
+    // They participate as the `Other` operand to a growable receiver's algebra;
+    // these tests exercise that path.
+
     @Test
-    func `Fixed algebra defaults`() throws {
-        var a = try Set<Int>.Ordered.Fixed(capacity: 8)
-        try a.insert(1)
-        try a.insert(2)
-        try a.insert(3)
+    func `Algebra with a Fixed operand`() throws {
+        var a = Set<Int>.Ordered()
+        a.insert(1)
+        a.insert(2)
+        a.insert(3)
         var b = try Set<Int>.Ordered.Fixed(capacity: 8)
         try b.insert(2)
         try b.insert(3)
@@ -522,16 +533,16 @@ struct SetProtocolTests {
 
         #expect(toArray(a.union(b)) == [1, 2, 3, 4])
         #expect(toArray(a.intersection(b)) == [2, 3])
-        #expect(toArray(a.subtract(b)) == [1])
+        #expect(toArray(a.subtracting(b)) == [1])
         #expect(toArray(a.symmetricDifference(b)) == [1, 4])
     }
 
     @Test
-    func `Static algebra defaults`() throws {
-        var a = Set<Int>.Ordered.Static<8>()
-        try a.insert(1)
-        try a.insert(2)
-        try a.insert(3)
+    func `Algebra with a Static operand`() throws {
+        var a = Set<Int>.Ordered()
+        a.insert(1)
+        a.insert(2)
+        a.insert(3)
         var b = Set<Int>.Ordered.Static<8>()
         try b.insert(2)
         try b.insert(3)
@@ -541,7 +552,7 @@ struct SetProtocolTests {
         #expect(unionResult == [1, 2, 3, 4])
         let intersectionResult = toArray(a.intersection(b))
         #expect(intersectionResult == [2, 3])
-        let subtractResult = toArray(a.subtract(b))
+        let subtractResult = toArray(a.subtracting(b))
         #expect(subtractResult == [1])
         let symDiffResult = toArray(a.symmetricDifference(b))
         #expect(symDiffResult == [1, 4])
@@ -562,7 +573,7 @@ struct SetProtocolTests {
         #expect(unionResult == [1, 2, 3, 4])
         let intersectionResult = toArray(a.intersection(b))
         #expect(intersectionResult == [2, 3])
-        let subtractResult = toArray(a.subtract(b))
+        let subtractResult = toArray(a.subtracting(b))
         #expect(subtractResult == [1])
         let symDiffResult = toArray(a.symmetricDifference(b))
         #expect(symDiffResult == [1, 4])
