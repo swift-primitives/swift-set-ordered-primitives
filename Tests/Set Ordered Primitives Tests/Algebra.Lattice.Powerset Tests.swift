@@ -68,8 +68,11 @@ extension PowersetLatticeTests {
         let a = PowersetLatticeTests.ordered([1, 3])
         let notA = universe.subtracting(a)              // U ∖ A = {2, 4}
         #expect(toArray(notA) == [2, 4])
-        // a ∨ ¬a = ⊤ (universe);  a ∧ ¬a = ⊥ (∅)
-        #expect(toArray(lattice.join(a, notA)) == toArray(universe))
+        // a ∨ ¬a = ⊤ (universe);  a ∧ ¬a = ⊥ (∅) — these are set-algebra laws, compared
+        // order-insensitively: `Set.Ordered` `==`/`toArray` are order-sensitive (element-wise
+        // over the span), and the join of two disjoint sets preserves insertion order, which need
+        // not match the universe's order. The lattice law is set equality, so sort before comparing.
+        #expect(toArray(lattice.join(a, notA)).sorted() == toArray(universe).sorted())
         #expect(toArray(lattice.meet(a, notA)).isEmpty)
     }
 }
