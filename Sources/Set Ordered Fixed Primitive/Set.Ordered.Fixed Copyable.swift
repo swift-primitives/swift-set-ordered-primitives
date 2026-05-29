@@ -32,15 +32,6 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
 // MARK: - Core Operations (Copyable elements)
 
 extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
-    /// Returns the index of the given element, or `nil` if not present.
-    @inlinable
-    public func index(_ element: Element) -> Index<Element>? {
-        hashTable.position(
-            forHash: element.hashValue,
-            equals: { idx in buffer[idx] == element }
-        )
-    }
-
     /// Inserts an element into the set.
     ///
     /// - Parameter element: The element to insert.

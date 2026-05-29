@@ -55,6 +55,21 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
         return try body(buffer[index])
     }
 
+    /// Returns the index of the given element, or `nil` if not present.
+    ///
+    /// - Complexity: O(1) average, O(n) worst case.
+    @inlinable
+    public func index(_ element: borrowing Element) -> Index<Element>? {
+        // Concrete witness delegating over the shared Hash.Table.Protocol `position`
+        // terminal — the index-returning sibling of `contains`. Relaxed to
+        // `~Copyable` via context-threading (no element capture in the closure).
+        hashTable.position(
+            forHash: element.hashValue,
+            context: element,
+            equals: { idx, elem in buffer[idx] == elem }
+        )
+    }
+
     /// Returns whether the set contains the given element.
     ///
     /// - Complexity: O(1) average, O(n) worst case.

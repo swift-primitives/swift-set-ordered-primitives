@@ -23,25 +23,6 @@ public import Buffer_Linear_Small_Primitive
 // MARK: - Core Operations (Copyable elements)
 
 extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
-    /// Returns the index of the given element, or `nil` if not present.
-    @inlinable
-    public func index(_ element: Element) -> Index<Element>? {
-        if isSpilled {
-            return hashTable!.position(
-                forHash: element.hashValue,
-                equals: { idx in buffer[idx] == element }
-            )
-        } else {
-            var idx: Index<Element> = .zero
-            let end = buffer.count.map(Ordinal.init)
-            while idx < end {
-                if buffer[idx] == element { return idx }
-                idx += .one
-            }
-            return nil
-        }
-    }
-
     /// Inserts an element into the set.
     ///
     /// If inline storage is full, spills to heap automatically.

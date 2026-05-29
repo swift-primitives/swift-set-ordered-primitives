@@ -80,6 +80,33 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
         return try body(buffer[index])
     }
 
+    /// Returns the index of the given element, or `nil` if not present.
+    ///
+    /// Uses O(1) hash-table lookup when spilled to heap, O(n) linear scan
+    /// when inline (no hash table available in inline mode).
+    @inlinable
+    public func index(_ element: borrowing Element) -> Index<Element>? {
+        if isSpilled {
+            // Borrowing optional-chaining over the shared Hash.Table.Protocol `position`
+            // terminal (optional chaining flattens to `Index<Element>?`). Avoids the
+            // `let ht = hashTable!` copy that gated the old `index(_:)` to `Copyable`.
+            // Spilled ⟹ `hashTable` is non-nil.
+            return hashTable?.position(
+                forHash: element.hashValue,
+                context: element,
+                equals: { idx, elem in buffer[idx] == elem }
+            )
+        } else {
+            var idx: Index<Element> = .zero
+            let end = buffer.count.map(Ordinal.init)
+            while idx < end {
+                if buffer[idx] == element { return idx }
+                idx += .one
+            }
+            return nil
+        }
+    }
+
     /// Returns whether the set contains the given element.
     ///
     /// Uses O(1) hash-table lookup when spilled to heap, O(n) linear scan
