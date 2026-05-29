@@ -37,6 +37,37 @@ struct SetOrderedSmallTypeTests {
     @Suite struct Integration {}
 }
 
+// MARK: - Equatable & Hashable (Hash.Protocol — closes the Small/Static vestigial gap)
+
+extension SetOrderedSmallTypeTests.Unit {
+    @Test func `Equality (Hash.Protocol, inline)`() {
+        var a = Set<Int>.Ordered.Small<8>(); a.insert(1); a.insert(2); a.insert(3)
+        var b = Set<Int>.Ordered.Small<8>(); b.insert(1); b.insert(2); b.insert(3)
+        var c = Set<Int>.Ordered.Small<8>(); c.insert(3); c.insert(2); c.insert(1)
+        let aEqualsB = a == b
+        let aNotEqualsC = !(a == c)
+        #expect(aEqualsB)
+        #expect(aNotEqualsC)  // insertion order is significant
+    }
+
+    @Test func `Equality (Hash.Protocol, spilled)`() {
+        var a = Set<Int>.Ordered.Small<2>(); a.insert(1); a.insert(2); a.insert(3)
+        var b = Set<Int>.Ordered.Small<2>(); b.insert(1); b.insert(2); b.insert(3)
+        let aSpilled = a.isSpilled
+        let aEqualsB = a == b
+        #expect(aSpilled)  // exercises the spilled-storage span
+        #expect(aEqualsB)
+    }
+
+    @Test func `Hashable (Hash.Protocol)`() {
+        var a = Set<Int>.Ordered.Small<8>(); a.insert(1); a.insert(2); a.insert(3)
+        var b = Set<Int>.Ordered.Small<8>(); b.insert(1); b.insert(2); b.insert(3)
+        let hashA = a.hashValue
+        let hashB = b.hashValue
+        #expect(hashA == hashB)
+    }
+}
+
 // MARK: - Unit
 
 extension SetOrderedSmallTypeTests.Unit {

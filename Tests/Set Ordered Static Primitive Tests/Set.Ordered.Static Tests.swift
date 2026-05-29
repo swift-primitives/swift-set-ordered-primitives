@@ -45,6 +45,28 @@ struct SetOrderedStaticTypeTests {
     @Suite struct Integration {}
 }
 
+// MARK: - Equatable & Hashable (Hash.Protocol — closes the Small/Static vestigial gap)
+
+extension SetOrderedStaticTypeTests.Unit {
+    @Test func `Equality (Hash.Protocol)`() throws {
+        var a = Set<Int>.Ordered.Static<8>(); try a.insert(1); try a.insert(2); try a.insert(3)
+        var b = Set<Int>.Ordered.Static<8>(); try b.insert(1); try b.insert(2); try b.insert(3)
+        var c = Set<Int>.Ordered.Static<8>(); try c.insert(3); try c.insert(2); try c.insert(1)
+        let aEqualsB = a == b
+        let aNotEqualsC = !(a == c)
+        #expect(aEqualsB)
+        #expect(aNotEqualsC)  // insertion order is significant
+    }
+
+    @Test func `Hashable (Hash.Protocol)`() throws {
+        var a = Set<Int>.Ordered.Static<8>(); try a.insert(1); try a.insert(2); try a.insert(3)
+        var b = Set<Int>.Ordered.Static<8>(); try b.insert(1); try b.insert(2); try b.insert(3)
+        let hashA = a.hashValue
+        let hashB = b.hashValue
+        #expect(hashA == hashB)
+    }
+}
+
 // MARK: - Unit
 
 extension SetOrderedStaticTypeTests.Unit {
