@@ -239,19 +239,19 @@ extension SetOrderedBuilderTests.StaticMethods {
 
     @Test
     func `buildExpression single element`() {
-        let result = Set<Int>.Ordered.Builder.buildExpression(42)
+        let result = Set<Int>.Builder.buildExpression(42)
         #expect(result == [42])
     }
 
     @Test
     func `buildExpression array`() {
-        let result = Set<Int>.Ordered.Builder.buildExpression([1, 2, 3])
+        let result = Set<Int>.Builder.buildExpression([1, 2, 3])
         #expect(result == [1, 2, 3])
     }
 
     @Test
     func `buildPartialBlock accumulated and next`() {
-        let result = Set<Int>.Ordered.Builder.buildPartialBlock(
+        let result = Set<Int>.Builder.buildPartialBlock(
             accumulated: [1, 2],
             next: [3, 4]
         )
@@ -260,7 +260,7 @@ extension SetOrderedBuilderTests.StaticMethods {
 
     @Test
     func `buildArray flattens components`() {
-        let result = Set<Int>.Ordered.Builder.buildArray([[1, 2], [3, 4], [5]])
+        let result = Set<Int>.Builder.buildArray([[1, 2], [3, 4], [5]])
         #expect(result == [1, 2, 3, 4, 5])
     }
 }

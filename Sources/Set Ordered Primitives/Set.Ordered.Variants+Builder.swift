@@ -12,14 +12,23 @@
 public import Set_Primitives
 public import Set_Ordered_Primitive
 
+// MARK: - Bounded-variant `@Set.Builder` DSL inits (one-line per variant)
+//
+// Growable variants (`Set.Ordered`, `Set.Ordered.Small`) inherit the free
+// `init(@Set.Builder …)` default from `Set.Buildable.`Protocol`` — their
+// boilerplate is gone. Bounded variants are NOT `Set.Buildable.`Protocol``
+// (a bounded `Self`-returning finalize can overflow — capability model §4.2),
+// so each carries a thin THROWING `init(@Set.Builder …)` over the hoisted
+// family `Set.Builder`. The `try` at the call site (`try Set.Static { … }`)
+// makes the overflow explicit — the same shape their throwing `insert` already
+// has. `Fixed` additionally takes a runtime `capacity:` (no no-arg `init()`).
+
 extension Set.Ordered.Static where Element: Copyable {
-    /// Constructs a fixed-capacity inline ordered set from a result-builder closure.
-    ///
-    /// Wraps the dynamic `Set<Element>.Ordered.Builder` per Round-2 Option Y.
-    /// Insertion order preserved; duplicates collapse. Overflow throws
+    /// Constructs a fixed-capacity inline ordered set from a `@Set.Builder`
+    /// closure. Insertion order preserved; duplicates collapse. Overflow throws
     /// `__SetOrderedInlineError`.
     public init(
-        @Set<Element>.Ordered.Builder _ builder: () -> [Element]
+        @Set<Element>.Builder _ builder: () -> [Element]
     ) throws(__SetOrderedInlineError<Element>) {
         let elements = builder()
         self.init()
@@ -29,30 +38,13 @@ extension Set.Ordered.Static where Element: Copyable {
     }
 }
 
-extension Set.Ordered.Small where Element: Copyable {
-    /// Constructs a SmallVec ordered set from a result-builder closure.
-    ///
-    /// Wraps the dynamic `Set<Element>.Ordered.Builder`. Non-throwing
-    /// because Small spills inline capacity to the heap.
-    public init(
-        @Set<Element>.Ordered.Builder _ builder: () -> [Element]
-    ) {
-        let elements = builder()
-        self.init()
-        for element in elements {
-            _ = self.insert(element)
-        }
-    }
-}
-
 extension Set.Ordered.Fixed where Element: Copyable {
-    /// Constructs a heap-allocated bounded ordered set from a result-builder closure.
-    ///
-    /// Wraps the dynamic `Set<Element>.Ordered.Builder`. Capacity at outer
-    /// init; overflow throws.
+    /// Constructs a heap-allocated bounded ordered set from a `@Set.Builder`
+    /// closure. Capacity at the outer init (runtime param — the one non-free
+    /// case); overflow throws `__SetOrderedFixedError`.
     public init(
         capacity: Index<Element>.Count,
-        @Set<Element>.Ordered.Builder _ builder: () -> [Element]
+        @Set<Element>.Builder _ builder: () -> [Element]
     ) throws(__SetOrderedFixedError<Element>) {
         var fixed = try Set<Element>.Ordered.Fixed(capacity: capacity)
         let elements = builder()
