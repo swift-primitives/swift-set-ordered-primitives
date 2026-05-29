@@ -19,11 +19,13 @@ public import Buffer_Linear_Small_Primitives
 // Set.Ordered.Small composes Buffer.Linear.Small (a complete type with public span
 // / makeIterator), so these delegate to the buffer's public API — no
 // raw-storage windows. `span` and `makeIterator` import no sequence/collection-
-// primitives, so they co-locate with the storage as plain `public` members; the cold
-// `Memory.Contiguous.Protocol` / `Sequenceable` conformances in the ops module are
-// thin and use them as witnesses (inlinable cross-package).
+// primitives, so they co-locate with the storage as plain `public` members.
+// `span` is the `~Copyable` witness for the `Memory.Contiguous.Protocol`
+// conformance (now co-located in this type module per the conformance-placement
+// decision, Set.Ordered.Small+Memory.Contiguous.Protocol.swift); `makeIterator` is
+// the `Copyable` witness for the cold `Sequenceable` conformance in the ops module.
 
-extension Set.Ordered.Small where Element: Copyable {
+extension Set.Ordered.Small where Element: ~Copyable {
 
     /// The elements in insertion order. Witness for `Memory.Contiguous.Protocol`.
     @inlinable
@@ -31,6 +33,9 @@ extension Set.Ordered.Small where Element: Copyable {
         @_lifetime(borrow self)
         borrowing get { buffer.span }
     }
+}
+
+extension Set.Ordered.Small where Element: Copyable {
 
     /// A single-pass consuming iterator in insertion order. Witness for `Sequenceable`.
     ///
@@ -45,7 +50,7 @@ extension Set.Ordered.Small where Element: Copyable {
 // MARK: - Buffer Access (Escape Hatch for C Interop)
 
 @_spi(Unsafe)
-extension Set.Ordered.Small where Element: Copyable {
+extension Set.Ordered.Small where Element: ~Copyable {
     /// Provides read-only access to the underlying contiguous storage.
     /// Witness for `Memory.Contiguous.Protocol`.
     ///
@@ -55,9 +60,16 @@ extension Set.Ordered.Small where Element: Copyable {
     public func withUnsafeBufferPointer<R, E: Swift.Error>(
         _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
     ) throws(E) -> R {
-        try unsafe buffer.withUnsafeBufferPointer(body)
+        // Relaxed to `~Copyable` via `buffer.span` (itself `~Copyable`); the buffer's
+        // own `withUnsafeBufferPointer` is `Copyable`-gated, so route through the
+        // span — matching base/Fixed/Static.
+        let span = buffer.span
+        return try unsafe span.withUnsafeBufferPointer(body)
     }
+}
 
+@_spi(Unsafe)
+extension Set.Ordered.Small where Element: Copyable {
     /// Provides mutable access to the underlying contiguous storage.
     ///
     /// - Warning: Prefer ``withMutableSpan(_:)`` for safe access.

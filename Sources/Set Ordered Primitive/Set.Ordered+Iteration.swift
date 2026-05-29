@@ -18,11 +18,13 @@ public import Buffer_Linear_Primitives
 // Set.Ordered composes Buffer.Linear (a complete type with public span /
 // makeIterator), so these delegate to the buffer's public API — no
 // raw-storage windows. `span` and `makeIterator` import no sequence/collection-
-// primitives, so they co-locate with the storage as plain `public` members; the
-// cold `Memory.Contiguous.Protocol` / `Sequenceable` conformances in the ops
-// module are thin and use them as witnesses (inlinable cross-package).
+// primitives, so they co-locate with the storage as plain `public` members.
+// `span` is the `~Copyable` witness for the `Memory.Contiguous.Protocol`
+// conformance (now co-located in this type module per the conformance-placement
+// decision, Set.Ordered+Memory.Contiguous.Protocol.swift); `makeIterator` is the
+// `Copyable` witness for the cold `Sequenceable` conformance in the ops module.
 
-extension Set.Ordered where Element: Copyable {
+extension Set.Ordered where Element: ~Copyable {
 
     /// The elements in insertion order. Witness for `Memory.Contiguous.Protocol`.
     @inlinable
@@ -30,6 +32,9 @@ extension Set.Ordered where Element: Copyable {
         @_lifetime(borrow self)
         borrowing get { buffer.span }
     }
+}
+
+extension Set.Ordered where Element: Copyable {
 
     /// A single-pass consuming iterator in insertion order. Witness for `Sequenceable`.
     @inlinable

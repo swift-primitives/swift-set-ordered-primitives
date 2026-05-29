@@ -12,7 +12,6 @@
 public import Iterator_Chunk_Primitives
 public import Iterable
 public import Sequence_Primitives
-public import Memory_Contiguous_Primitives
 public import Memory_Iterator_Primitives
 // `@_spi(Unsafe)` ([MOD-016] per-file): the `withUnsafeBufferPointer` witness for
 // `Memory.Contiguous.Protocol` is the `@_spi(Unsafe)` hot op co-located in the type
@@ -38,13 +37,12 @@ public import Buffer_Linear_Inline_Primitives
 // Witnesses (`span`, `makeIterator`, `withUnsafeBufferPointer`) are public members
 // in the type module; these conformances are thin ([MOD-036] refined-C).
 
-// Memory.Contiguous.Protocol exposes the inline buffer's span so the
-// memory→Iterable bridge can vend `Iterator.Chunk`. `span` and
-// `withUnsafeBufferPointer` are provided in the type module (same package).
-extension Set.Ordered.Static: Memory.Contiguous.`Protocol` where Element: Copyable {}
-
+// `Memory.Contiguous.Protocol` conformance now lives in the type module
+// (Set.Ordered.Static+Memory.Contiguous.Protocol.swift, `where Element: ~Copyable`)
+// per the conformance-placement decision.
+//
 // Iterable — multipass borrowing `makeIterator()` vended FOR FREE by the
-// memory→Iterable bridge over Memory.Contiguous.Protocol, yielding Iterator.Chunk.
+// memory→Iterable bridge over that conformance, yielding Iterator.Chunk.
 extension Set.Ordered.Static: Iterable where Element: Copyable {
     @_implements(Iterable, Iterator)
     public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>

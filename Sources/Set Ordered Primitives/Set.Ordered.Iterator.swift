@@ -12,7 +12,6 @@
 public import Iterable
 public import Iterator_Chunk_Primitives
 public import Sequence_Primitives
-public import Memory_Contiguous_Primitives
 public import Memory_Iterator_Primitives
 // `@_spi(Unsafe)` ([MOD-016] per-file): the `withUnsafeBufferPointer` witness for
 // `Memory.Contiguous.Protocol` is the `@_spi(Unsafe)` hot op co-located in the type
@@ -40,13 +39,10 @@ public import Buffer_Linear_Primitives
 // uniformly later). Reversible; a set's core surface is membership/algebra, not
 // for-in, so the drop is low-impact now.
 
-// Memory.Contiguous.Protocol exposes the insertion-ordered span so the
-// memory→Iterable bridge can vend `Iterator.Chunk`. `withUnsafeBufferPointer`
-// is provided in Set.Ordered ~Copyable.swift (same module).
-// Witnesses (`span`, `withUnsafeBufferPointer`) are public members in the type
-// module; this conformance is thin ([MOD-036] refined-C).
-extension Set.Ordered: Memory.Contiguous.`Protocol` where Element: Copyable {}
-
+// `Memory.Contiguous.Protocol` conformance now lives in the type module
+// (Set.Ordered+Memory.Contiguous.Protocol.swift, `where Element: ~Copyable`) per
+// the conformance-placement decision. The memory→Iterable bridge keys off that
+// conformance + the `Iterable` conformance below to vend `Iterator.Chunk`.
 extension Set.Ordered: Iterable where Element: Copyable {
     @_implements(Iterable, Iterator)
     public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
