@@ -46,6 +46,17 @@ extension SetOrderedIndexedTests.Dynamic {
         #expect(indexed.index(20) == b.index)
         #expect(!indexed.isEmpty)
     }
+
+    @Test
+    func `inserting a duplicate returns inserted=false and the same typed index`() {
+        enum Tag {}
+        var indexed = Set<Int>.Ordered.Indexed<Tag>(Set<Int>.Ordered())
+        let first = indexed.insert(42)
+        let again = indexed.insert(42)
+        #expect(first.inserted)
+        #expect(!again.inserted)
+        #expect(again.index == first.index)   // retag identity under the duplicate path
+    }
 }
 
 // MARK: - Fixed (Copyable wrapper, plain Index<Tag>, throwing insert)
@@ -111,5 +122,20 @@ extension SetOrderedIndexedTests.Static {
         #expect(has10)
         #expect(!full)
         #expect(!empty)
+    }
+
+    @Test
+    func `insert beyond capacity surfaces the bounded-overflow throw through Indexed`() {
+        enum Tag {}
+        var indexed = Set<Int>.Ordered.Static<2>.Indexed<Tag>(Set<Int>.Ordered.Static<2>())
+        do {
+            _ = try indexed.insert(10)
+            _ = try indexed.insert(20)   // at capacity 2
+            _ = try indexed.insert(30)   // overflow
+            Issue.record("expected bounded-overflow throw")
+        } catch {
+            // expected __SetOrderedInlineError — the Indexed wrapper propagates the
+            // variant's throwing insert contract.
+        }
     }
 }

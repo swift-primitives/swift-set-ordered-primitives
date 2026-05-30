@@ -125,6 +125,10 @@ extension Set_Primitives.Set.Ordered.Small.Indexed where Element: Copyable {
 extension Set_Primitives.Set.Ordered.Small.Indexed where Element: Copyable {
     /// Inserts an element into the set.
     ///
+    /// Insertion never fails: `Small` spills from its inline buffer to the heap once the
+    /// inline threshold is exceeded (unlike the bounded `Fixed`/`Static`, whose `insert`
+    /// throws on overflow). Non-throwing, like the dynamic `Set.Ordered`.
+    ///
     /// - Parameter element: The element to insert.
     /// - Returns: A tuple indicating whether insertion occurred and the element's typed index.
     @inlinable

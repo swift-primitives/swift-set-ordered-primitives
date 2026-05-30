@@ -32,6 +32,14 @@ extension Set_Primitives.Set.Ordered.Static where Element: Copyable {
     /// growable variants (dynamic, `.Small`); the fan-out blueprint applies the same rule (a
     /// bounded discipline's `Indexed` uses bounded indices).
     ///
+    /// ## No runtime `capacity` property
+    ///
+    /// Unlike the dynamic / `.Fixed` / `.Small` `Indexed` (whose capacity is runtime state), `Static`'s
+    /// capacity is the **compile-time type parameter** `capacity` — it lives in the type, not as a
+    /// runtime property, so neither `Static` nor this wrapper exposes a `capacity` accessor. The
+    /// blueprint rule: `Indexed` mirrors its variant's surface, and a compile-time-bounded variant
+    /// has no runtime capacity to mirror (the bound is already in `Index<Tag>.Bounded<capacity>`).
+    ///
     /// ## Usage
     ///
     /// ```swift
