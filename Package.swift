@@ -41,6 +41,11 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
+        // The build capability: growable variants conform builder-primitives'
+        // generic `Buildable` (Initiable init() + add) for the free `{ … }` DSL;
+        // bounded variants drain its shared @Builder / Buffer<Element>.Linear
+        // accumulator. There is no set-specific Set.Buildable.Protocol/Set.Builder.
+        .package(url: "https://github.com/swift-primitives/swift-builder-primitives.git", branch: "main"),
         // NOTE: swift-set-algebra-primitives is intentionally NOT a dependency of
         // this package (library OR tests). The ordered-set discipline and the set
         // algebra are orthogonal, mutually-independent concerns (set-builder ⊥
@@ -159,6 +164,8 @@ let package = Package(
             dependencies: [
                 "Set Ordered Small Primitive",
                 "Set Ordered Primitive",
+                // Builder Primitives: Set.Ordered.Small conforms the generic Buildable.
+                .product(name: "Builder Primitives", package: "swift-builder-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitive", package: "swift-buffer-linear-primitives"),
@@ -180,6 +187,9 @@ let package = Package(
                 "Set Ordered Fixed Primitives",
                 "Set Ordered Static Primitives",
                 "Set Ordered Small Primitives",
+                // Builder Primitives: Set.Ordered conforms the generic Buildable (free
+                // { … } DSL + inherited algebra); bounded variants drain @Builder.
+                .product(name: "Builder Primitives", package: "swift-builder-primitives"),
                 // NOTE: set algebra is intentionally NOT a dependency of the
                 // ordered-set library. Algebra is composed at the consumer
                 // (import Set_Ordered_Primitives + Set_Algebra_Primitives).

@@ -9,6 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
+import Builder_Primitives
 import Set_Ordered_Primitives_Test_Support
 import Testing
 

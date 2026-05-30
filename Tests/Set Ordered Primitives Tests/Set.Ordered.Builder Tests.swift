@@ -9,6 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
+import Builder_Primitives
 import Testing
 
 @testable import Set_Ordered_Primitives
@@ -20,7 +21,6 @@ struct SetOrderedBuilderTests {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct Integration {}
-    @Suite struct StaticMethods {}
 }
 
 // MARK: - Helpers
@@ -155,11 +155,11 @@ extension SetOrderedBuilderTests.Unit {
     }
 
     @Test
-    func `For loop produces ordered set`() {
+    func `Sequence expression bulk-adds in order`() {
+        // The @Builder grammar has no for-loop rule (its partial result is
+        // ~Copyable); a single Sequence expression is the supported substitute.
         let set = Set<Int>.Ordered {
-            for i in 1...5 {
-                i
-            }
+            1...5
         }
         #expect(SetOrderedBuilderTests.collected(set) == [1, 2, 3, 4, 5])
     }
@@ -184,9 +184,7 @@ extension SetOrderedBuilderTests.EdgeCase {
     @Test
     func `All unique many elements`() {
         let set = Set<Int>.Ordered {
-            for i in 1...10 {
-                i
-            }
+            1...10
         }
         #expect(SetOrderedBuilderTests.collected(set) == Swift.Array(1...10))
     }
@@ -233,34 +231,7 @@ extension SetOrderedBuilderTests.Integration {
     }
 }
 
-// MARK: - Static Method Tests
-
-extension SetOrderedBuilderTests.StaticMethods {
-
-    @Test
-    func `buildExpression single element`() {
-        let result = Set<Int>.Builder.buildExpression(42)
-        #expect(result == [42])
-    }
-
-    @Test
-    func `buildExpression array`() {
-        let result = Set<Int>.Builder.buildExpression([1, 2, 3])
-        #expect(result == [1, 2, 3])
-    }
-
-    @Test
-    func `buildPartialBlock accumulated and next`() {
-        let result = Set<Int>.Builder.buildPartialBlock(
-            accumulated: [1, 2],
-            next: [3, 4]
-        )
-        #expect(result == [1, 2, 3, 4])
-    }
-
-    @Test
-    func `buildArray flattens components`() {
-        let result = Set<Int>.Builder.buildArray([[1, 2], [3, 4], [5]])
-        #expect(result == [1, 2, 3, 4, 5])
-    }
-}
+// NB: the former `StaticMethods` suite tested `Set.Builder`'s result-builder
+// static methods (buildExpression/buildPartialBlock/buildArray) directly. That
+// set-specific builder is deleted — the ecosystem-wide @Builder grammar from
+// builder-primitives replaces it, and its grammar is tested in that package.
