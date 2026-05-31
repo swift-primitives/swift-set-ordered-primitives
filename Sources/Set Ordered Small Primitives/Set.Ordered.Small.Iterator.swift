@@ -43,7 +43,7 @@ public import Buffer_Linear_Small_Primitives
 //
 // Iterable — multipass borrowing `makeIterator()` vended FOR FREE by the
 // memory→Iterable bridge over that conformance, yielding Iterator.Chunk.
-extension Set.Ordered.Small: Iterable where Element: Copyable {
+extension Set.Ordered.Small: Iterable where Element: ~Copyable {
     @_implements(Iterable, Iterator)
     public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
 }

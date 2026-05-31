@@ -107,6 +107,12 @@ extension Set.Ordered where Element: ~Copyable {
     /// Iterates over all elements in the set.
     ///
     /// - Parameter body: A closure that receives each borrowed element.
+    ///
+    /// NOTE (SE-0516 cascade): retained as the disambiguating member between the now-`~Copyable`
+    /// `Iterable.forEach` (span loop, D3) and `Sequenceable.forEach` — both apply to a Copyable
+    /// `Set.Ordered`, so a direct member is needed to keep `set.forEach { }` unambiguous. Acceptance #4
+    /// asked for deletion, but deletion regresses to an ambiguous call (Iterable vs Sequenceable) for
+    /// Copyable elements — flagged for the supervisor's architecture-shape call.
     @inlinable
     public func forEach<E: Swift.Error>(_ body: (borrowing Element) throws(E) -> Void) throws(E) {
         let count = buffer.count

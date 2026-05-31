@@ -232,19 +232,6 @@ extension Set_Primitives.Set.Ordered.Static where Element: ~Copyable {
         return body(buffer[index])
     }
 
-    /// Iterates over all elements in the set.
-    @inlinable
-    public func forEach<E: Swift.Error>(_ body: (borrowing Element) throws(E) -> Void) throws(E) {
-        let count = buffer.count
-        guard count > .zero else { return }
-        var index: Index<Element> = .zero
-        let end = count.map(Ordinal.init)
-        while index < end {
-            try body(buffer[index])
-            index += .one
-        }
-    }
-
     /// Removes and consumes all elements.
     @inlinable
     public mutating func drain(_ body: (consuming Element) -> Void) {

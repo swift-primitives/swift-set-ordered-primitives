@@ -39,7 +39,7 @@ public import Buffer_Linear_Bounded_Primitives
 // Iterable — the multipass borrowing `makeIterator()` is vended FOR FREE by the
 // memory→Iterable bridge over that conformance, yielding `Iterator.Chunk` (no
 // hand-written iterator).
-extension Set.Ordered.Fixed: Iterable where Element: Copyable {
+extension Set.Ordered.Fixed: Iterable where Element: ~Copyable {
     @_implements(Iterable, Iterator)
     public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
 }

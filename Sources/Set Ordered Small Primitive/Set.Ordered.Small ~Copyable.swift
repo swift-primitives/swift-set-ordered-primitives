@@ -134,18 +134,6 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
         }
     }
 
-    /// Iterates over all elements in the set.
-    @inlinable
-    public func forEach<E: Swift.Error>(_ body: (borrowing Element) throws(E) -> Void) throws(E) {
-        let count = count
-        guard count > .zero else { return }
-        var index: Index<Element> = .zero
-        let end = count.map(Ordinal.init)
-        while index < end {
-            try body(buffer[index])
-            index += .one
-        }
-    }
 }
 
 // MARK: - Drain (Copyable-gated — B2 hazard, mutating)

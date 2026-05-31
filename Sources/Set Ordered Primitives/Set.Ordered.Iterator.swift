@@ -43,7 +43,7 @@ public import Buffer_Linear_Primitives
 // (Set.Ordered+Memory.Contiguous.Protocol.swift, `where Element: ~Copyable`) per
 // the conformance-placement decision. The memory→Iterable bridge keys off that
 // conformance + the `Iterable` conformance below to vend `Iterator.Chunk`.
-extension Set.Ordered: Iterable where Element: Copyable {
+extension Set.Ordered: Iterable where Element: ~Copyable {
     @_implements(Iterable, Iterator)
     public typealias IterableIterator = Iterator_Chunk_Primitives.Iterator.Chunk<Element>
 }
