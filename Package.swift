@@ -67,8 +67,6 @@ let package = Package(
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
-                // [MOD-036] refined-C: the hot operation surface (insert/remove/
-                // algebra/indexed/builder) co-located here imports these.
                 .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
@@ -83,8 +81,6 @@ let package = Package(
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Bounded Primitives", package: "swift-buffer-linear-primitives"),
-                // [MOD-036] refined-C: the hot operation surface (insert/remove/
-                // indexed/iteration witnesses) co-located here imports these.
                 .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
@@ -99,8 +95,6 @@ let package = Package(
                 .product(name: "Hash Table Static Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Inline Primitives", package: "swift-buffer-linear-primitives"),
-                // [MOD-036] refined-C: the hot operation surface (insert/remove/
-                // bounded-index access/iteration witnesses) co-located here imports these.
                 .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Finite Primitives", package: "swift-finite-primitives"),
             ]
@@ -116,8 +110,6 @@ let package = Package(
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitives", package: "swift-buffer-linear-primitives"),
-                // [MOD-036] refined-C: the hot operation surface (insert/remove/
-                // spill-management/iteration witnesses) co-located here imports these.
                 .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
@@ -187,12 +179,7 @@ let package = Package(
                 "Set Ordered Fixed Primitives",
                 "Set Ordered Static Primitives",
                 "Set Ordered Small Primitives",
-                // Builder Primitives: Set.Ordered conforms the generic Buildable (free
-                // { … } DSL + inherited algebra); bounded variants drain @Builder.
                 .product(name: "Builder Primitives", package: "swift-builder-primitives"),
-                // NOTE: set algebra is intentionally NOT a dependency of the
-                // ordered-set library. Algebra is composed at the consumer
-                // (import Set_Ordered_Primitives + Set_Algebra_Primitives).
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),

@@ -25,4 +25,11 @@ public import Memory_Contiguous_Primitives
 // Iterable` and continues to vend the borrowing `Iterator.Chunk` when the type
 // also declares `: Iterable` (Copyable, in the ops module).
 
-extension Set.Ordered: Memory.Contiguous.`Protocol` where Element: ~Copyable {}
+extension Set.Ordered: Memory.Contiguous.`Protocol` where Element: ~Copyable {
+    /// The elements in insertion order. Witness for `Memory.Contiguous.Protocol`.
+    @inlinable
+    public var span: Swift.Span<Element> {
+        @_lifetime(borrow self)
+        borrowing get { buffer.span }
+    }
+}
