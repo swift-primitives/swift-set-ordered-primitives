@@ -38,7 +38,7 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
         buffer.append(element)
 
         if wasSpilled {
-            hashTable.insert(_unchecked: (), position: index, hashValue: element.hashValue)
+            hashTable!.insert(_unchecked: (), position: index, hashValue: element.hashValue)
         } else if buffer.isSpilled {
             buildHashTable()
         }
@@ -52,14 +52,22 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     public mutating func remove(_ element: Element) -> Element? {
         if isSpilled {
             guard
-                let removedPosition = hashTable.remove(
+                let removedPosition = hashTable!.remove(
                     hashValue: element.hashValue,
                     equals: { idx in buffer[idx] == element }
                 )
             else { return nil }
 
             let removed = buffer.remove(at: removedPosition)
-            hashTable.positions.decrement(after: removedPosition)
+
+            // WORKAROUND: Extract hash table to local for .positions.decrement() call.
+            // Direct `hashTable!.positions.decrement(after:)` crashes the
+            // DiagnoseStaticExclusivity SIL pass on generic ~Copyable structs.
+            // WHEN TO REMOVE: When swiftlang/swift fixes exclusivity analysis for
+            // mutating coroutine accessor chains on stored properties of ~Copyable generics.
+            var ht = hashTable!
+            ht.positions.decrement(after: removedPosition)
+            hashTable = ht
 
             return removed
         } else {
@@ -73,9 +81,17 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     public mutating func clear(keepingCapacity: Bool = false) {
         buffer.remove.all(keepingCapacity: keepingCapacity)
         if keepingCapacity {
-            hashTable.remove.all(keepingCapacity: true)
+            // WORKAROUND: Extract hash table to local for .remove.all() call.
+            // Direct `hashTable?.remove.all(keepingCapacity:)` crashes the
+            // DiagnoseStaticExclusivity SIL pass on generic ~Copyable structs.
+            // WHEN TO REMOVE: When swiftlang/swift fixes exclusivity analysis for
+            // mutating coroutine accessor chains on stored properties of ~Copyable generics.
+            if var ht = hashTable {
+                ht.remove.all(keepingCapacity: true)
+                hashTable = ht
+            }
         } else {
-            hashTable = Hash.Table<Element>(minimumCapacity: .zero)
+            hashTable = nil
         }
     }
 }
@@ -91,7 +107,7 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
         var idx: Index<Element> = .zero
         let end = count.map(Ordinal.init)
         while idx < end {
-            hashTable.insert(_unchecked: (), position: idx, hashValue: buffer[idx].hashValue)
+            hashTable!.insert(_unchecked: (), position: idx, hashValue: buffer[idx].hashValue)
             idx += .one
         }
     }
