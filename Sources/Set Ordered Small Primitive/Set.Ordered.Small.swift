@@ -43,15 +43,19 @@ extension Set.Ordered where Element: ~Copyable {
         @usableFromInline
         internal var buffer: Buffer<Element>.Linear.Small<inlineCapacity>
 
-        /// Hash table — non-nil after spill.
+        /// Hash table — sentinel-empty (zero-capacity) while inline; populated on
+        /// spill. Non-Optional so the mutating ops (`drain`/`clear`/`remove`) hit a
+        /// definitely-present `~Copyable` value directly, with no optional in-place
+        /// mutate — the take-and-put-back workaround the optional form needed to
+        /// dodge `DiagnoseStaticExclusivity` (A11) is gone.
         @usableFromInline
-        internal var hashTable: Hash.Table<Element>?
+        internal var hashTable: Hash.Table<Element>
 
         /// Creates an empty small ordered set.
         @inlinable
         public init() {
             self.buffer = Buffer<Element>.Linear.Small<inlineCapacity>()
-            self.hashTable = nil
+            self.hashTable = Hash.Table<Element>(minimumCapacity: .zero)
         }
     }
 }

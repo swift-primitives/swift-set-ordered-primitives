@@ -56,12 +56,11 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
 
 // MARK: - Borrowed Element Access (~Copyable-safe read surface)
 //
-// `withElement`/`contains`/`forEach` only BORROW the storage, so they are
-// `~Copyable`-safe. `contains` reads the optional `~Copyable` `hashTable` via
-// borrowing optional-chaining (`hashTable?.position(...)`) — no extraction — so it no
-// longer requires `Copyable` (the prior `let ht = hashTable!` forced a copy, which is
-// what gated this whole group). Only the *mutating* `drain()` stays `Copyable`-gated
-// (below) — the B2 hazard, surfaced not fixed.
+// `withElement`/`contains`/`index` only BORROW the storage, so they are
+// `~Copyable`-safe. When spilled, `contains`/`index` probe the sentinel-empty
+// `~Copyable` `hashTable` directly (§2.9) — a borrow, no extraction, so no `Copyable`
+// gate. Only the *mutating* `drain()` stays `Copyable`-gated (below) for its elements
+// — the B2 hazard, surfaced not fixed.
 
 extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     /// Accesses the element at the given index via closure.
@@ -87,11 +86,11 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     @inlinable
     public func index(_ element: borrowing Element) -> Index<Element>? {
         if isSpilled {
-            // Borrowing optional-chaining over the shared Hash.Table.Protocol `position`
-            // terminal (optional chaining flattens to `Index<Element>?`). Avoids the
-            // `let ht = hashTable!` copy that gated the old `index(_:)` to `Copyable`.
-            // Spilled ⟹ `hashTable` is non-nil.
-            return hashTable?.position(
+            // Direct probe over the shared Hash.Table.Protocol `position` terminal.
+            // `hashTable` is sentinel-empty inline, populated on spill (§2.9), so when
+            // spilled this returns the real position; the borrow keeps it `~Copyable`-safe
+            // (no extraction).
+            return hashTable.position(
                 forHash: element.hashValue,
                 context: element,
                 equals: { idx, elem in buffer[idx] == elem }
@@ -114,15 +113,14 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     @inlinable
     public func contains(_ element: borrowing Element) -> Bool {
         if isSpilled {
-            // Borrowing optional-chaining over the shared Hash.Table.Protocol membership
-            // terminal — probes the optional `~Copyable` hash table without extracting it.
-            // (The old `let ht = hashTable!` forced a copy, gating this op to `Copyable`.)
-            // Spilled ⟹ `hashTable` is non-nil, so the `?? false` fallback is unreached.
-            return hashTable?.contains(
+            // Direct probe over the shared Hash.Table.Protocol membership terminal.
+            // `hashTable` is sentinel-empty inline, populated on spill (§2.9); the borrow
+            // keeps it `~Copyable`-safe (no extraction).
+            return hashTable.contains(
                 forHash: element.hashValue,
                 context: element,
                 equals: { idx, elem in buffer[idx] == elem }
-            ) ?? false
+            )
         } else {
             var idx: Index<Element> = .zero
             let end = buffer.count.map(Ordinal.init)
@@ -136,16 +134,15 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
 
 }
 
-// MARK: - Drain (Copyable-gated — B2 hazard, mutating)
+// MARK: - Drain (Copyable, mutating)
 //
-// `drain()` must stay `Copyable`-gated: emptying the optional `~Copyable` `hashTable`
-// in place crashes DiagnoseStaticExclusivity, and the take-and-put-back workaround
-// hits the `~Copyable` "partial reinitialize after consume" rule. Structural redesign
-// deferred to the unified iteration rework (B2 hazard — surfaced, not fixed here).
+// With the sentinel-empty `hashTable` (§2.9), `drain()` empties a definitely-present
+// `~Copyable` value directly — no optional unwrap, no take-and-put-back — so the
+// `DiagnoseStaticExclusivity` (A11) workaround is gone. Stays `Copyable`-gated for its
+// elements; the B2 Small-CoW hazard is surfaced separately, not addressed here.
 
 extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Removes and consumes all elements.
-    // on buffer.remove loop + hashTable operations in deep @inlinable chain.
     @inlinable
     public mutating func drain(_ body: (consuming Element) -> Void) {
         guard count > .zero else { return }
@@ -154,15 +151,7 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
             body(buffer.remove.first())
         }
 
-        // WORKAROUND: Extract hash table to local for .remove.all() call.
-        // Direct `hashTable?.remove.all(keepingCapacity:)` crashes the
-        // DiagnoseStaticExclusivity SIL pass on generic ~Copyable structs.
-        // WHEN TO REMOVE: When swiftlang/swift fixes exclusivity analysis for
-        // mutating coroutine accessor chains on stored properties of ~Copyable generics.
-        if var ht = hashTable {
-            ht.remove.all(keepingCapacity: true)
-            hashTable = ht
-        }
+        hashTable.remove.all(keepingCapacity: true)
     }
 }
 
