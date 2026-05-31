@@ -12,7 +12,7 @@
 internal import Property_Primitives
 import Sequence_Primitives
 public import Set_Primitives
-public import Set_Ordered_Primitive
+public import Set_Ordered_Small_Primitive
 
 // MARK: - Sequence.Drain.Protocol Conformance
 

@@ -14,26 +14,12 @@ public import Buffer_Linear_Primitive
 public import Buffer_Linear_Small_Primitive
 public import Buffer_Linear_Small_Primitives
 
-// MARK: - Iteration accessors ([MOD-036] refined-C)
+// MARK: - Sequenceable witness (makeIterator)
 //
-// Set.Ordered.Small composes Buffer.Linear.Small (a complete type with public span
-// / makeIterator), so these delegate to the buffer's public API — no
-// raw-storage windows. `span` and `makeIterator` import no sequence/collection-
-// primitives, so they co-locate with the storage as plain `public` members.
-// `span` is the `~Copyable` witness for the `Memory.Contiguous.Protocol`
-// conformance (now co-located in this type module per the conformance-placement
-// decision, Set.Ordered.Small+Memory.Contiguous.Protocol.swift); `makeIterator` is
-// the `Copyable` witness for the cold `Sequenceable` conformance in the ops module.
-
-extension Set.Ordered.Small where Element: ~Copyable {
-
-    /// The elements in insertion order. Witness for `Memory.Contiguous.Protocol`.
-    @inlinable
-    public var span: Swift.Span<Element> {
-        @_lifetime(borrow self)
-        borrowing get { buffer.span }
-    }
-}
+// The single-pass consuming iterator in insertion order — the `Copyable` witness for
+// the cold `Sequenceable` conformance (declared in the ops module,
+// Set.Ordered.Small+Sequenceable.swift). A public member in the type module per
+// [MOD-036] refined-C; delegates to the composed buffer's public makeIterator.
 
 extension Set.Ordered.Small where Element: Copyable {
 
