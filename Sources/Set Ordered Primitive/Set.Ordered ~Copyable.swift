@@ -106,24 +106,6 @@ extension Set.Ordered where Element: ~Copyable {
 }
 
 // ============================================================================
-// MARK: - Span Access
-// ============================================================================
-
-extension Set.Ordered where Element: ~Copyable {
-    /// Provides read-only span access to the set's elements in insertion order.
-    ///
-    /// - Parameter body: A closure that receives the span.
-    /// - Returns: The value returned by the closure.
-    /// - Throws: Rethrows any error thrown by the closure.
-    @inlinable
-    public func withSpan<R, E: Swift.Error>(
-        _ body: (Span<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        try body(buffer.span)
-    }
-}
-
-// ============================================================================
 // MARK: - Buffer Access (Escape Hatch for C Interop)
 // ============================================================================
 

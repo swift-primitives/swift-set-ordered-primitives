@@ -98,14 +98,6 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
 // MARK: - Span Access
 
 extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
-    /// Provides read-only span access to the set's elements in insertion order.
-    @inlinable
-    public func withSpan<R, E: Swift.Error>(
-        _ body: (Span<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        try body(buffer.span)
-    }
-
     /// Provides mutable span access to the set's elements in insertion order.
     ///
     /// - Warning: Modifying elements through this span may invalidate the hash table.

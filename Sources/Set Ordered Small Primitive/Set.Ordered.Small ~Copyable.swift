@@ -169,18 +169,6 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
 // MARK: - Span Access (Closure-Based)
 
 extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
-    /// Safe, bounds-checked read access to contiguous storage via closure.
-    ///
-    /// Small sets use closure-based access because inline storage mode requires
-    /// it (Span is ~Escapable and cannot be returned from property accessors
-    /// without special compiler support).
-    @inlinable
-    public func withSpan<R, E: Swift.Error>(
-        _ body: (Span<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        try body(buffer.span)
-    }
-
     /// Safe, bounds-checked write access to contiguous storage via closure.
     ///
     /// - Warning: Modifying elements may invalidate uniqueness if the
