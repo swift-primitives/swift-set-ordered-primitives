@@ -31,13 +31,17 @@ public import Buffer_Linear_Primitives
 // the bridge constructs `Iterator.Chunk(self.span)`, so the span lifetime ties
 // to `self` cleanly.
 //
-// `Set.Ordered` no longer conforms to `Swift.Sequence`: the iteration family is
-// `~Copyable, ~Escapable` end-to-end, which cannot back a Copyable stdlib
-// `IteratorProtocol`. Matches buffer-linear; PENDING ecosystem Swift.Sequence-
-// interop reconciliation (array-primitives still keeps Swift.Sequence where
-// Element: Copyable — the inconsistency is an ecosystem-wide decision to settle
-// uniformly later). Reversible; a set's core surface is membership/algebra, not
-// for-in, so the drop is low-impact now.
+// `Set.Ordered` does not conform to `Swift.Sequence`: the span-primitive iteration
+// family is `~Copyable, ~Escapable` end-to-end and cannot back a Copyable stdlib
+// `IteratorProtocol` without re-introducing a per-type Copyable iterator (deleted in
+// the SE-0516 migration). This is the DEFERRED `Swift.Sequence`-interop axis (design
+// §2.8 reconciled 2026-05-31): the migrated span-primitive types — Set.Ordered,
+// Buffer.Linear, and Array (grep-verified: array-primitives has NO `Swift.Sequence`
+// conformance, only a generic builder constraint) — all drop the per-type Copyable
+// iterator. The eventual uniform shape is a single generic `Swift.Sequence` bridge
+// (`where Element: Copyable`, vended once and inherited), settled ecosystem-wide
+// at/before the ×16 fan-out — NOT a per-type wart baked onto the exemplar template.
+// (A set's core surface is membership/algebra, not for-in; the drop is low-impact.)
 
 // `Memory.Contiguous.Protocol` conformance now lives in the type module
 // (Set.Ordered+Memory.Contiguous.Protocol.swift, `where Element: ~Copyable`) per
