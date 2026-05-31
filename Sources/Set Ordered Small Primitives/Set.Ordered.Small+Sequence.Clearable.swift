@@ -11,7 +11,7 @@
 
 public import Set_Primitives
 public import Set_Ordered_Small_Primitive
-public import Sequence_Primitives
+import Sequence_Primitives
 
 // MARK: - Sequence.Clearable Conformance
 

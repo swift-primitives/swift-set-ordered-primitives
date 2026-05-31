@@ -12,11 +12,8 @@
 public import Iterator_Chunk_Primitives
 public import Iterable
 public import Sequence_Primitives
-public import Memory_Iterator_Primitives
-// `@_spi(Unsafe)` ([MOD-016] per-file): the `withUnsafeBufferPointer` witness for
-// `Memory.Contiguous.Protocol` is the `@_spi(Unsafe)` hot op co-located in the type
-// module ([MOD-036] refined-C); this conformance file must opt into the SPI to see it.
-@_spi(Unsafe) public import Set_Ordered_Static_Primitive
+import Memory_Iterator_Primitives
+public import Set_Ordered_Static_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Inline_Primitives
 

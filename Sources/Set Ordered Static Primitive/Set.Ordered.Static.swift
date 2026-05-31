@@ -11,7 +11,6 @@
 
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
-public import Buffer_Linear_Inline_Primitives
 import Hash_Table_Static_Primitives
 import Index_Primitives
 

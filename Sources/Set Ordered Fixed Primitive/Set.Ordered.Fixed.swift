@@ -11,8 +11,6 @@
 
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Bounded_Primitive
-public import Buffer_Linear_Bounded_Primitives
-public import Hash_Table_Primitives
 import Index_Primitives
 
 extension Set.Ordered where Element: ~Copyable {

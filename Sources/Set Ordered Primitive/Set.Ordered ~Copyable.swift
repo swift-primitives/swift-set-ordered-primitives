@@ -104,20 +104,3 @@ extension Set.Ordered where Element: ~Copyable {
         )
     }
 }
-
-// ============================================================================
-// MARK: - Buffer Access (Escape Hatch for C Interop)
-// ============================================================================
-
-@_spi(Unsafe)
-extension Set.Ordered where Element: ~Copyable {
-    /// Provides read-only access to the underlying contiguous storage.
-    @unsafe
-    @inlinable
-    public func withUnsafeBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        let span = buffer.span
-        return try unsafe span.withUnsafeBufferPointer(body)
-    }
-}

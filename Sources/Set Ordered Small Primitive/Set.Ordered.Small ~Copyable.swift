@@ -166,18 +166,18 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     }
 }
 
-// MARK: - Span Access (Closure-Based)
+// MARK: - Mutable Span (Direct)
 
 extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
-    /// Safe, bounds-checked write access to contiguous storage via closure.
+    /// Direct mutable span access to the set's elements in insertion order.
     ///
     /// - Warning: Modifying elements may invalidate uniqueness if the
     ///   modifications affect element equality/hash.
+    /// - Note: Raw mutable-pointer access (C interop) is on the span:
+    ///   `mutableSpan.withUnsafeMutableBufferPointer { … }`.
     @inlinable
-    public mutating func withMutableSpan<R, E: Swift.Error>(
-        _ body: (inout MutableSpan<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        var span = buffer.mutableSpan
-        return try body(&span)
+    public var mutableSpan: MutableSpan<Element> {
+        @_lifetime(&self)
+        mutating get { buffer.mutableSpan }
     }
 }

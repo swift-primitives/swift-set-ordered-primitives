@@ -97,44 +97,20 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
 
 // MARK: - Span Access
 
-extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
-    /// Provides mutable span access to the set's elements in insertion order.
+extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
+    /// Direct mutable span access to the set's elements in insertion order.
     ///
-    /// - Warning: Modifying elements through this span may invalidate the hash table.
-    ///   Only use for in-place updates that preserve element identity/hash.
+    /// - Warning: Modifying elements through this span may invalidate the hash
+    ///   table. Only use for in-place updates that preserve element identity/hash.
+    /// - Note: Raw mutable-pointer access (C interop) is on the span:
+    ///   `mutableSpan.withUnsafeMutableBufferPointer { … }`.
     @inlinable
-    public mutating func withMutableSpan<R, E: Swift.Error>(
-        _ body: (inout MutableSpan<Element>) throws(E) -> R
-    ) throws(E) -> R where Element: Copyable {
-        makeUnique()
-        var span = buffer.mutableSpan
-        return try body(&span)
-    }
-}
-
-// MARK: - Buffer Access (Escape Hatch for C Interop)
-
-@_spi(Unsafe)
-extension Set_Primitives.Set.Ordered.Fixed where Element: ~Copyable {
-    /// Provides read-only access to the underlying contiguous storage.
-    @unsafe
-    @inlinable
-    public func withUnsafeBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        let span = buffer.span
-        return try unsafe span.withUnsafeBufferPointer(body)
-    }
-
-    /// Provides mutable access to the underlying contiguous storage.
-    @unsafe
-    @inlinable
-    public mutating func withUnsafeMutableBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeMutableBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R where Element: Copyable {
-        makeUnique()
-        var span = buffer.mutableSpan
-        return try unsafe span.withUnsafeMutableBufferPointer(body)
+    public var mutableSpan: MutableSpan<Element> {
+        @_lifetime(&self)
+        mutating get {
+            makeUnique()
+            return buffer.mutableSpan
+        }
     }
 }
 

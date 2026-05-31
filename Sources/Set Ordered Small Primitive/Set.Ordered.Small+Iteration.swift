@@ -46,39 +46,3 @@ extension Set.Ordered.Small where Element: Copyable {
         buffer.makeIterator()
     }
 }
-
-// MARK: - Buffer Access (Escape Hatch for C Interop)
-
-@_spi(Unsafe)
-extension Set.Ordered.Small where Element: ~Copyable {
-    /// Provides read-only access to the underlying contiguous storage.
-    /// Witness for `Memory.Contiguous.Protocol`.
-    ///
-    /// - Warning: Prefer ``withSpan(_:)`` for safe access.
-    @unsafe
-    @inlinable
-    public func withUnsafeBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        // Relaxed to `~Copyable` via `buffer.span` (itself `~Copyable`); the buffer's
-        // own `withUnsafeBufferPointer` is `Copyable`-gated, so route through the
-        // span — matching base/Fixed/Static.
-        let span = buffer.span
-        return try unsafe span.withUnsafeBufferPointer(body)
-    }
-}
-
-@_spi(Unsafe)
-extension Set.Ordered.Small where Element: Copyable {
-    /// Provides mutable access to the underlying contiguous storage.
-    ///
-    /// - Warning: Prefer ``withMutableSpan(_:)`` for safe access.
-    /// - Warning: Modifying elements may invalidate uniqueness.
-    @unsafe
-    @inlinable
-    public mutating func withUnsafeMutableBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeMutableBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        try unsafe buffer.withUnsafeMutableBufferPointer(body)
-    }
-}

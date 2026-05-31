@@ -17,9 +17,8 @@ public import Memory_Contiguous_Primitives
 // Co-located with the type and its span witness ([MOD-036] refined-C;
 // conformance-placement decision, sibling to Set.Ordered.Fixed+Set.Protocol.swift):
 // `Memory.Contiguous.Protocol` is ~Copyable-compatible (`associatedtype Element:
-// ~Copyable`); both witnesses live in this type module — `span`
-// (Set.Ordered.Fixed+Iteration.swift) and the `@_spi(Unsafe) withUnsafeBufferPointer`
-// (Set.Ordered.Fixed ~Copyable.swift), each `where Element: ~Copyable`. This is the
+// ~Copyable`); its single requirement `span` (Set.Ordered.Fixed+Iteration.swift,
+// `where Element: ~Copyable`) is witnessed in this type module. This is the
 // memory-layer span capability, NOT iteration: the memory→Iterable bridge keys off
 // `Memory.ContiguousProtocol where Self: Iterable` and continues to vend the
 // borrowing `Iterator.Chunk` when the type also declares `: Iterable` (Copyable, in

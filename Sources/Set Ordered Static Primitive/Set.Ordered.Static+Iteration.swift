@@ -45,20 +45,3 @@ extension Set.Ordered.Static where Element: Copyable {
         buffer.makeIterator()
     }
 }
-
-// MARK: - Buffer Access (Escape Hatch for C Interop)
-
-@_spi(Unsafe)
-extension Set.Ordered.Static where Element: ~Copyable {
-    /// Provides read-only access to the underlying contiguous storage.
-    /// Witness for `Memory.Contiguous.Protocol`. Relaxed to `~Copyable`: the body
-    /// already routes through `buffer.span` (itself `~Copyable`).
-    @unsafe
-    @inlinable
-    public func withUnsafeBufferPointer<R, E: Swift.Error>(
-        _ body: (UnsafeBufferPointer<Element>) throws(E) -> R
-    ) throws(E) -> R {
-        let span = buffer.span
-        return try unsafe span.withUnsafeBufferPointer(body)
-    }
-}
