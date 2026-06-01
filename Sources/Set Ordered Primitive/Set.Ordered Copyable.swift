@@ -10,6 +10,10 @@
 // ===----------------------------------------------------------------------===//
 
 public import Cardinal_Primitives
+// Direct import so `element.hashValue` resolves to `Hash.Protocol`'s typed
+// `Hash.Value` accessor (Swift 6.4+); under MemberImportVisibility, without it the
+// member is invisible cross-module and falls back to `Swift.Hashable`'s `Int`.
+import Hash_Protocol_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
 public import Set_Primitives
