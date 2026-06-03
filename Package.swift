@@ -32,6 +32,9 @@ let package = Package(
         .library(name: "Set Ordered Primitives Test Support", targets: ["Set Ordered Primitives Test Support"]),
     ],
     dependencies: [
+        .package(path: "../swift-memory-primitives--w2"),
+        .package(path: "../swift-span-primitives"),
+        .package(path: "../swift-memory-iterator-primitives--w2"),
         .package(url: "https://github.com/swift-primitives/swift-set-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-bit-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
@@ -62,6 +65,7 @@ let package = Package(
         .target(
             name: "Set Ordered Primitive",
             dependencies: [
+                .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
                 .product(name: "Set Primitives", package: "swift-set-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
@@ -77,6 +81,7 @@ let package = Package(
             name: "Set Ordered Fixed Primitive",
             dependencies: [
                 "Set Ordered Primitive",
+                .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
@@ -91,6 +96,7 @@ let package = Package(
             name: "Set Ordered Static Primitive",
             dependencies: [
                 "Set Ordered Primitive",
+                .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Hash Table Static Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
@@ -105,6 +111,7 @@ let package = Package(
             name: "Set Ordered Small Primitive",
             dependencies: [
                 "Set Ordered Primitive",
+                .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
@@ -121,6 +128,7 @@ let package = Package(
             dependencies: [
                 "Set Ordered Fixed Primitive",
                 "Set Ordered Primitive",
+                .product(name: "Memory Iterator Primitives", package: "swift-memory-iterator-primitives--w2"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Bounded Primitives", package: "swift-buffer-linear-primitives"),
@@ -139,6 +147,7 @@ let package = Package(
             dependencies: [
                 "Set Ordered Static Primitive",
                 "Set Ordered Primitive",
+                .product(name: "Memory Iterator Primitives", package: "swift-memory-iterator-primitives--w2"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Inline Primitives", package: "swift-buffer-linear-primitives"),
@@ -156,6 +165,7 @@ let package = Package(
             dependencies: [
                 "Set Ordered Small Primitive",
                 "Set Ordered Primitive",
+                .product(name: "Memory Iterator Primitives", package: "swift-memory-iterator-primitives--w2"),
                 // Builder Primitives: Set.Ordered.Small conforms the generic Buildable.
                 .product(name: "Builder Primitives", package: "swift-builder-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
@@ -179,6 +189,7 @@ let package = Package(
                 "Set Ordered Fixed Primitives",
                 "Set Ordered Static Primitives",
                 "Set Ordered Small Primitives",
+                .product(name: "Memory Iterator Primitives", package: "swift-memory-iterator-primitives--w2"),
                 .product(name: "Builder Primitives", package: "swift-builder-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
