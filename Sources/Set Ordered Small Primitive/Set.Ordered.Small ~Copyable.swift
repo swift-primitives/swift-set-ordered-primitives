@@ -176,7 +176,7 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     /// - Note: Raw mutable-pointer access (C interop) is on the span:
     ///   `mutableSpan.withUnsafeMutableBufferPointer { … }`.
     @inlinable
-    public var mutableSpan: MutableSpan<Element> {
+    public var mutableSpan: Swift.MutableSpan<Element> {
         @_lifetime(&self)
         mutating get { buffer.mutableSpan }
     }
