@@ -109,7 +109,7 @@ extension Set_Primitives.Set.Ordered.Fixed where Element: Copyable {
         @_lifetime(&self)
         mutating get {
             makeUnique()
-            return buffer.mutableSpan
+            return buffer.mutableSpan()
         }
     }
 }

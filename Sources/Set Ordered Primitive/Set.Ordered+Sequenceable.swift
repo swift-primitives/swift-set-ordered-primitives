@@ -24,7 +24,7 @@ extension Set.Ordered where Element: Copyable {
 
     /// A single-pass consuming iterator in insertion order. Witness for `Sequenceable`.
     @inlinable
-    public consuming func makeIterator() -> Buffer<Element>.Linear.Scalar {
+    public consuming func makeIterator() -> Buffer<Storage<Element>.Heap>.Linear.Scalar {
         buffer.makeIterator()
     }
 }

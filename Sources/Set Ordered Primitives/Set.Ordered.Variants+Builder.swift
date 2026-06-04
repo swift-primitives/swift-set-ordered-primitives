@@ -20,7 +20,7 @@ public import Set_Ordered_Primitive
 // boilerplate is gone. Bounded variants are NOT `Buildable` (a bounded
 // `Self`-returning finalize can overflow — capability model §4.2), so each
 // carries a thin THROWING `init(@Builder …)` that drains builder-primitives'
-// shared `Buffer<Element>.Linear` accumulator through the variant's own throwing
+// shared `Buffer<Storage<Element>.Heap>.Linear` accumulator through the variant's own throwing
 // `insert`. The `try` at the call site (`try Set.Static { … }`) makes the
 // overflow explicit — the same shape the throwing `insert` already has. `Fixed`
 // additionally takes a runtime `capacity:` (no no-arg `init()`).
@@ -36,7 +36,7 @@ extension Set.Ordered.Static where Element: Copyable {
     /// Insertion order preserved; duplicates collapse. Overflow throws
     /// `__SetOrderedInlineError`.
     public init(
-        @Builder<Element> _ content: () -> Buffer<Element>.Linear
+        @Builder<Element> _ content: () -> Buffer<Storage<Element>.Heap>.Linear
     ) throws(__SetOrderedInlineError<Element>) {
         var buffer = content()
         self.init()
@@ -52,7 +52,7 @@ extension Set.Ordered.Fixed where Element: Copyable {
     /// overflow throws `__SetOrderedFixedError`.
     public init(
         capacity: Index<Element>.Count,
-        @Builder<Element> _ content: () -> Buffer<Element>.Linear
+        @Builder<Element> _ content: () -> Buffer<Storage<Element>.Heap>.Linear
     ) throws(__SetOrderedFixedError<Element>) {
         var fixed = try Set<Element>.Ordered.Fixed(capacity: capacity)
         var buffer = content()

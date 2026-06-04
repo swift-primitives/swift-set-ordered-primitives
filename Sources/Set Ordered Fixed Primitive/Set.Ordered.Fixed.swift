@@ -19,7 +19,7 @@ extension Set.Ordered where Element: ~Copyable {
 
     /// A fixed-capacity ordered set that throws on overflow.
     ///
-    /// Composes `Buffer<Element>.Linear.Bounded` for element storage and
+    /// Composes `Buffer<Storage<Element>.Heap>.Linear.Bounded` for element storage and
     /// `Hash.Table<Element>` for O(1) position lookup.
     // WHY: Category D — structural Sendable workaround; the type is
     // WHY: structurally value-safe but the compiler cannot synthesize
@@ -34,7 +34,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// sequence/collection-family conformances in the ops module reach this
         /// storage only through the public `span` / `makeIterator` witnesses.
         @usableFromInline
-        internal var buffer: Buffer<Element>.Linear.Bounded
+        internal var buffer: Buffer<Storage<Element>.Heap>.Linear.Bounded
 
         /// Hash table for O(1) position lookup.
         @usableFromInline
@@ -46,7 +46,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// Creates a Fixed ordered set with the specified capacity.
         @inlinable
         public init(capacity: Index_Primitives.Index<Element>.Count) throws(__SetOrderedFixedError<Element>) {
-            self.buffer = Buffer<Element>.Linear.Bounded(minimumCapacity: capacity)
+            self.buffer = Buffer<Storage<Element>.Heap>.Linear.Bounded(minimumCapacity: capacity)
             self.hashTable = Hash.Table<Element>(minimumCapacity: capacity)
             self.maximumCapacity = capacity
         }

@@ -29,7 +29,7 @@ public import Buffer_Linear_Inline_Primitives
 
 extension Set.Ordered.Static: Sequenceable where Element: Copyable {
     @_implements(Sequenceable, Iterator)
-    public typealias SequenceableIterator = Buffer<Element>.Linear.Inline<capacity>.Scalar
+    public typealias SequenceableIterator = Buffer<Storage<Element>.Heap>.Linear.Inline<capacity>.Scalar
 
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable

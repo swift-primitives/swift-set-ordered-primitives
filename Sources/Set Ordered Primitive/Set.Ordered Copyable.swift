@@ -191,7 +191,7 @@ extension Set.Ordered where Element: Copyable {
         @_lifetime(&self)
         mutating get {
             makeUnique()
-            return buffer.mutableSpan
+            return buffer.mutableSpan()
         }
     }
 }

@@ -29,7 +29,7 @@ public import Buffer_Linear_Bounded_Primitives
 
 extension Set.Ordered.Fixed: Sequenceable where Element: Copyable {
     @_implements(Sequenceable, Iterator)
-    public typealias SequenceableIterator = Buffer<Element>.Linear.Bounded.Scalar
+    public typealias SequenceableIterator = Buffer<Storage<Element>.Heap>.Linear.Bounded.Scalar
 
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable

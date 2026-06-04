@@ -21,7 +21,7 @@ extension Set.Ordered where Element: ~Copyable {
 
     /// An ordered set with small-buffer optimization (SmallVec pattern).
     ///
-    /// Composes `Buffer<Element>.Linear.Small<inlineCapacity>` for element storage
+    /// Composes `Buffer<Storage<Element>.Heap>.Linear.Small<inlineCapacity>` for element storage
     /// and `Hash.Table<Element>` after spill.
     ///
     /// Inline mode uses O(n) linear scan — no hash table overhead for small sizes.
@@ -41,7 +41,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// sequence/collection-family conformances in the ops module reach this
         /// storage only through the public `span` / `makeIterator` witnesses.
         @usableFromInline
-        internal var buffer: Buffer<Element>.Linear.Small<inlineCapacity>
+        internal var buffer: Buffer<Storage<Element>.Heap>.Linear.Small<inlineCapacity>
 
         /// Hash table — non-nil after spill.
         @usableFromInline
@@ -50,7 +50,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// Creates an empty small ordered set.
         @inlinable
         public init() {
-            self.buffer = Buffer<Element>.Linear.Small<inlineCapacity>()
+            self.buffer = Buffer<Storage<Element>.Heap>.Linear.Small<inlineCapacity>()
             self.hashTable = nil
         }
     }

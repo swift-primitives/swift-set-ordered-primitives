@@ -28,7 +28,7 @@ extension Set.Ordered.Small where Element: Copyable {
     /// Enabled by `@frozen` on the Small struct, which permits the partial consume
     /// of `buffer`.
     @inlinable
-    public consuming func makeIterator() -> Buffer<Element>.Linear.Small<inlineCapacity>.Scalar {
+    public consuming func makeIterator() -> Buffer<Storage<Element>.Heap>.Linear.Small<inlineCapacity>.Scalar {
         buffer.makeIterator()
     }
 }

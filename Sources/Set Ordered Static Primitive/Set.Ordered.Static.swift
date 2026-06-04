@@ -20,7 +20,7 @@ extension Set.Ordered where Element: ~Copyable {
 
     /// A fixed-capacity, inline-storage ordered set with compile-time capacity.
     ///
-    /// Composes `Buffer<Element>.Linear.Inline<capacity>` for element storage and
+    /// Composes `Buffer<Storage<Element>.Heap>.Linear.Inline<capacity>` for element storage and
     /// `Hash.Table<Element>.Static<capacity>` for O(1) position lookup.
     ///
     /// - Precondition: `capacity` must be a power of two (required by Hash.Table.Static).
@@ -39,7 +39,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// sequence/collection-family conformances in the ops module reach this
         /// storage only through the public `span` / `makeIterator` witnesses.
         @usableFromInline
-        internal var buffer: Buffer<Element>.Linear.Inline<capacity>
+        internal var buffer: Buffer<Storage<Element>.Heap>.Linear.Inline<capacity>
 
         /// Hash table for O(1) position lookup.
         @usableFromInline
@@ -50,7 +50,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// - Precondition: `capacity` must be a power of two.
         @inlinable
         public init() {
-            self.buffer = Buffer<Element>.Linear.Inline<capacity>()
+            self.buffer = Buffer<Storage<Element>.Heap>.Linear.Inline<capacity>()
             // Hash.Table.Static.init() validates power-of-two capacity
             self.hashTable = Hash.Table<Element>.Static<capacity>()
         }
