@@ -32,21 +32,21 @@ let package = Package(
         .library(name: "Set Ordered Primitives Test Support", targets: ["Set Ordered Primitives Test Support"]),
     ],
     dependencies: [
-        .package(path: "../swift-memory-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-memory-primitives.git", branch: "main"),
         .package(path: "../swift-span-primitives"),
-        .package(path: "../swift-memory-iterator-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-memory-iterator-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-set-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-bit-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
         // W3 ⑤-(N): hash-table is reparam'd onto the (b-pin) Split-substrate Slots;
         // path-dep the worktree so its closure (→ buffer-slots → reparam'd
         // buffer-primitives) unifies under one identity (Finding 7/10).
-        .package(path: "../swift-hash-table-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-hash-table-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-hash-primitives.git", branch: "main"),
         // W2 mesh: buffer packages on their  worktrees so every path to memory
         // unifies on identity swift-memory-primitives (collision resolved).
-        .package(path: "../swift-buffer-primitives"),
-        .package(path: "../swift-buffer-linear-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
         // The build capability: growable variants conform builder-primitives'
