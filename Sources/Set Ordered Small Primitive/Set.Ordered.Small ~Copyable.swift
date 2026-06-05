@@ -23,7 +23,7 @@ public import Buffer_Linear_Small_Primitive
 //
 // ## Design Note
 //
-// Small sets compose Buffer<Storage<Element>.Heap>.Linear.Small<inlineCapacity> for element
+// Small sets compose Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Small<inlineCapacity> for element
 // storage. The buffer handles inline/heap dispatch internally. The set layer
 // adds hash table management (activated on spill) and deduplication.
 //

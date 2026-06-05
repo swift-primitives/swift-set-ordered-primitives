@@ -10,6 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 public import Set_Primitives
+public import Memory_Heap_Primitives
+public import Storage_Contiguous_Primitives
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Small_Primitive
 public import Buffer_Linear_Small_Primitives
@@ -28,7 +30,7 @@ extension Set.Ordered.Small where Element: Copyable {
     /// Enabled by `@frozen` on the Small struct, which permits the partial consume
     /// of `buffer`.
     @inlinable
-    public consuming func makeIterator() -> Buffer<Storage<Element>.Heap>.Linear.Small<inlineCapacity>.Scalar {
+    public consuming func makeIterator() -> Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Small<inlineCapacity>.Scalar {
         buffer.makeIterator()
     }
 }

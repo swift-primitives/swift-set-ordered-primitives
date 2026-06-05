@@ -10,6 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 public import Set_Primitives
+public import Memory_Heap_Primitives
+public import Storage_Contiguous_Primitives
 public import Buffer_Linear_Bounded_Primitive
 public import Buffer_Linear_Bounded_Primitives
 
@@ -24,7 +26,7 @@ extension Set.Ordered.Fixed where Element: Copyable {
 
     /// A single-pass consuming iterator in insertion order. Witness for `Sequenceable`.
     @inlinable
-    public consuming func makeIterator() -> Buffer<Storage<Element>.Heap>.Linear.Bounded.Scalar {
+    public consuming func makeIterator() -> Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Bounded.Scalar {
         buffer.makeIterator()
     }
 }

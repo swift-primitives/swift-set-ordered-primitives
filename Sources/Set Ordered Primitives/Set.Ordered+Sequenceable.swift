@@ -10,6 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 public import Sequence_Primitives
+public import Memory_Heap_Primitives
+public import Storage_Contiguous_Primitives
 public import Set_Ordered_Primitive
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
@@ -29,7 +31,7 @@ public import Buffer_Linear_Primitives
 
 extension Set.Ordered: Sequenceable where Element: Copyable {
     @_implements(Sequenceable, Iterator)
-    public typealias SequenceableIterator = Buffer<Storage<Element>.Heap>.Linear.Scalar
+    public typealias SequenceableIterator = Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Scalar
 
     /// Returns the count as the underestimated count since we know the exact size.
     @inlinable

@@ -63,6 +63,8 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-ordinal-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-cardinal-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-finite-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-memory-heap-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-storage-primitives.git", branch: "main"),
     ],
     targets: [
 

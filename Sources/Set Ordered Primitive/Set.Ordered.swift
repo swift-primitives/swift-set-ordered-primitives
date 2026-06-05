@@ -20,7 +20,7 @@ extension Set where Element: Hash.`Protocol` & ~Copyable {
 
     /// An ordered set that preserves insertion order with O(1) membership testing.
     ///
-    /// Composes `Buffer<Storage<Element>.Heap>.Linear` for element storage and
+    /// Composes `Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear` for element storage and
     /// `Hash.Table<Element>` for O(1) position lookup.
     // WHY: Category D — structural Sendable workaround; the type is
     // WHY: structurally value-safe but the compiler cannot synthesize
@@ -39,7 +39,7 @@ extension Set where Element: Hash.`Protocol` & ~Copyable {
         /// storage only through the `package` windows in
         /// `Set.Ordered+ConformanceSupport.swift`.
         @usableFromInline
-        internal var buffer: Buffer<Storage<Element>.Heap>.Linear
+        internal var buffer: Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear
 
         /// Hash table for O(1) position lookup.
         @usableFromInline
@@ -50,7 +50,7 @@ extension Set where Element: Hash.`Protocol` & ~Copyable {
         /// Creates an empty ordered set.
         @inlinable
         public init() {
-            self.buffer = Buffer<Storage<Element>.Heap>.Linear(minimumCapacity: .zero)
+            self.buffer = Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear(minimumCapacity: .zero)
             self.hashTable = Hash.Table<Element>(minimumCapacity: .zero)
         }
 
