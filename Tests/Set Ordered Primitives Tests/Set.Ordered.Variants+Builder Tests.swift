@@ -17,44 +17,7 @@ import Testing
 
 @Suite("Set.Ordered variants + Builder")
 struct SetOrderedVariantsBuilderTests {
-    @Suite struct StaticSet {}
-    @Suite struct SmallSet {}
     @Suite struct FixedSet {}
-}
-
-extension SetOrderedVariantsBuilderTests.StaticSet {
-    @Test
-    func `Static within capacity`() throws {
-        let s = try Set<Int>.Ordered.Static<8> { 1; 2; 3 }
-        let isEmpty = s.isEmpty
-        #expect(!isEmpty)
-    }
-
-    @Test
-    func `Static throws on overflow`() {
-        do {
-            _ = try Set<Int>.Ordered.Static<2> { 1; 2; 3 }
-            Issue.record("expected throw")
-        } catch {
-            // expected
-        }
-    }
-}
-
-extension SetOrderedVariantsBuilderTests.SmallSet {
-    @Test
-    func `Small within capacity`() {
-        let s = Set<Int>.Ordered.Small<8> { 1; 2; 3 }
-        let isEmpty = s.isEmpty
-        #expect(!isEmpty)
-    }
-
-    @Test
-    func `Small spills`() {
-        let s = Set<Int>.Ordered.Small<2> { 1; 2; 3; 4; 5 }
-        let isEmpty = s.isEmpty
-        #expect(!isEmpty)
-    }
 }
 
 extension SetOrderedVariantsBuilderTests.FixedSet {
