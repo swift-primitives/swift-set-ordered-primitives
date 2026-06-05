@@ -10,15 +10,14 @@
 // ===----------------------------------------------------------------------===//
 
 public import Set_Primitives
-public import Set_Ordered_Primitive
-import Sequence_Primitives
+public import Set_Ordered_Fixed_Primitive
 
-// MARK: - Sequence.Clearable Conformance
+// MARK: - removeAll()
 
-extension Set.Ordered: Sequence.Clearable where Element: Copyable {
+extension Set.Ordered.Fixed where Element: Copyable {
     /// Removes all elements from the set.
     ///
-    /// This enables `.forEach.consuming { }` pattern via `Property.Inout` extension.
+    /// The capacity remains unchanged.
     @inlinable
     public mutating func removeAll() {
         clear(keepingCapacity: false)
