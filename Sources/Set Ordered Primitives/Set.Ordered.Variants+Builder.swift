@@ -31,20 +31,6 @@ public import Set_Ordered_Primitive
 // by that grammar (its partial result is `~Copyable`); use a single `Sequence`
 // expression (`try Set.Static { 1...5 }`) instead.
 
-extension Set.Ordered.Static where Element: Copyable {
-    /// Constructs a fixed-capacity inline ordered set from a `@Builder` closure.
-    /// Insertion order preserved; duplicates collapse. Overflow throws
-    /// `__SetOrderedInlineError`.
-    public init(
-        @Builder<Element> _ content: () -> Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear
-    ) throws(__SetOrderedInlineError<Element>) {
-        var buffer = content()
-        self.init()
-        while !buffer.isEmpty {
-            _ = try self.insert(buffer.remove.first())
-        }
-    }
-}
 
 extension Set.Ordered.Fixed where Element: Copyable {
     /// Constructs a heap-allocated bounded ordered set from a `@Builder` closure.
