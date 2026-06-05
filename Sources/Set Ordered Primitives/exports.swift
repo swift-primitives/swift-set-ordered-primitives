@@ -18,8 +18,6 @@
 
 @_exported public import Set_Ordered_Primitive
 @_exported public import Set_Ordered_Fixed_Primitives
-@_exported public import Set_Ordered_Static_Primitives
-@_exported public import Set_Ordered_Small_Primitives
 // NOTE: set algebra is NOT re-exported here. The ordered-set discipline and the
 // set algebra are orthogonal concerns composed at the consumer: a consumer that
 // wants algebra over Set.Ordered imports BOTH `Set_Ordered_Primitives` and
