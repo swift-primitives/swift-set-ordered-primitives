@@ -10,6 +10,10 @@
 // ===----------------------------------------------------------------------===//
 
 public import Builder_Primitives
+public import Storage_Small_Primitives
+public import Storage_Primitive
+public import Buffer_Linear_Primitive
+public import Buffer_Linear_Primitives
 public import Set_Ordered_Small_Primitive
 
 // MARK: - Buildable Conformance (builder-primitives' generic build capability)

@@ -10,6 +10,10 @@
 // ===----------------------------------------------------------------------===//
 
 import Cardinal_Primitives
+public import Storage_Small_Primitives
+public import Storage_Primitive
+public import Buffer_Linear_Primitive
+public import Buffer_Linear_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
 public import Set_Primitives
@@ -33,13 +37,13 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
             return (false, existing)
         }
 
-        let wasSpilled = buffer.isSpilled
+        let wasSpilled = buffer.substrate.isSpilled
         let index = buffer.count.map(Ordinal.init)
         buffer.append(element)
 
         if wasSpilled {
             hashTable!.insert(_unchecked: (), position: index, hashValue: element.hashValue)
-        } else if buffer.isSpilled {
+        } else if buffer.substrate.isSpilled {
             buildHashTable()
         }
 
@@ -79,7 +83,7 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
     /// Removes all elements from the set.
     @inlinable
     public mutating func clear(keepingCapacity: Bool = false) {
-        buffer.remove.all(keepingCapacity: keepingCapacity)
+        buffer.removeAll(keepingCapacity: keepingCapacity)
         if keepingCapacity {
             // WORKAROUND: Extract hash table to local for .remove.all() call.
             // Direct `hashTable?.remove.all(keepingCapacity:)` crashes the

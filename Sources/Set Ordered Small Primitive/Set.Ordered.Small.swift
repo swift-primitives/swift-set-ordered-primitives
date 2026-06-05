@@ -10,6 +10,10 @@
 // ===----------------------------------------------------------------------===//
 
 public import Set_Ordered_Primitive
+public import Storage_Small_Primitives
+public import Storage_Primitive
+public import Buffer_Linear_Primitive
+public import Buffer_Linear_Primitives
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Small_Primitive
 import Hash_Table_Primitives
@@ -21,7 +25,7 @@ extension Set.Ordered where Element: ~Copyable {
 
     /// An ordered set with small-buffer optimization (SmallVec pattern).
     ///
-    /// Composes `Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Small<inlineCapacity>` for element storage
+    /// Composes `Buffer<Storage<Element>.Small<inlineCapacity>>.Linear` for element storage
     /// and `Hash.Table<Element>` after spill.
     ///
     /// Inline mode uses O(n) linear scan — no hash table overhead for small sizes.
@@ -41,7 +45,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// sequence/collection-family conformances in the ops module reach this
         /// storage only through the public `span` / `makeIterator` witnesses.
         @usableFromInline
-        internal var buffer: Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Small<inlineCapacity>
+        internal var buffer: Buffer<Storage<Element>.Small<inlineCapacity>>.Linear
 
         /// Hash table — non-nil after spill.
         @usableFromInline
@@ -50,7 +54,7 @@ extension Set.Ordered where Element: ~Copyable {
         /// Creates an empty small ordered set.
         @inlinable
         public init() {
-            self.buffer = Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Small<inlineCapacity>()
+            self.buffer = Buffer<Storage<Element>.Small<inlineCapacity>>.Linear()
             self.hashTable = nil
         }
     }

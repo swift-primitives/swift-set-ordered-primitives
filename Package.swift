@@ -123,6 +123,11 @@ let package = Package(
                 .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitive", package: "swift-buffer-linear-primitives"),
+                // Cleave-3 #12a/#5a: Set.Ordered.Small composes Buffer<Storage<E>.Small<n>>.Linear.
+                .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
+                .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
+                .product(name: "Storage Small Primitives", package: "swift-storage-primitives"),
+                .product(name: "Storage Primitive", package: "swift-storage-primitives"),
                 .product(name: "Buffer Linear Small Primitives", package: "swift-buffer-linear-primitives"),
                 .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
@@ -178,6 +183,11 @@ let package = Package(
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Small Primitive", package: "swift-buffer-linear-primitives"),
+                // Cleave-3 #12a/#5a: Set.Ordered.Small composes Buffer<Storage<E>.Small<n>>.Linear.
+                .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
+                .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
+                .product(name: "Storage Small Primitives", package: "swift-storage-primitives"),
+                .product(name: "Storage Primitive", package: "swift-storage-primitives"),
                 .product(name: "Buffer Linear Small Primitives", package: "swift-buffer-linear-primitives"),
                 .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
                 .product(name: "Iterable", package: "swift-iterator-primitives"),

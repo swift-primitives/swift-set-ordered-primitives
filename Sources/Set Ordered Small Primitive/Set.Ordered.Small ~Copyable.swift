@@ -10,6 +10,10 @@
 // ===----------------------------------------------------------------------===//
 
 import Cardinal_Primitives
+public import Storage_Small_Primitives
+public import Storage_Primitive
+public import Buffer_Linear_Primitive
+public import Buffer_Linear_Primitives
 import Index_Primitives
 public import Ordinal_Primitives
 public import Set_Primitives
@@ -23,7 +27,7 @@ public import Buffer_Linear_Small_Primitive
 //
 // ## Design Note
 //
-// Small sets compose Buffer<Storage<Element>.Contiguous<Memory.Heap<Element>>>.Linear.Small<inlineCapacity> for element
+// Small sets compose Buffer<Storage<Element>.Small<inlineCapacity>>.Linear for element
 // storage. The buffer handles inline/heap dispatch internally. The set layer
 // adds hash table management (activated on spill) and deduplication.
 //
@@ -35,7 +39,7 @@ public import Buffer_Linear_Small_Primitive
 extension Set.Ordered.Small where Element: ~Copyable {
     /// Whether the set has spilled to heap storage.
     @inlinable
-    public var isSpilled: Bool { buffer.isSpilled }
+    public var isSpilled: Bool { buffer.substrate.isSpilled }
 }
 
 // MARK: - Properties
@@ -151,7 +155,7 @@ extension Set_Primitives.Set.Ordered.Small where Element: Copyable {
         guard count > .zero else { return }
 
         while !buffer.isEmpty {
-            body(buffer.remove.first())
+            body(buffer.removeFirst())
         }
 
         // WORKAROUND: Extract hash table to local for .remove.all() call.
@@ -178,6 +182,6 @@ extension Set_Primitives.Set.Ordered.Small where Element: ~Copyable {
     @inlinable
     public var mutableSpan: Swift.MutableSpan<Element> {
         @_lifetime(&self)
-        mutating get { buffer.mutableSpan }
+        mutating get { buffer.mutableSpan() }
     }
 }
