@@ -62,6 +62,5 @@ extension Set.Ordered {
     public typealias Error = __SetOrderedError<Element>
 }
 
-// `Set.Ordered.Fixed.Error` and `Set.Ordered.Static.Error` typealiases live in
-// their respective variant target modules (Set Ordered Fixed Primitive /
-// Set Ordered Static Primitive), since `Fixed`/`Static` are declared there.
+// The `Set.Ordered.Fixed.Error` typealias lives in the variant target module
+// (Set Ordered Fixed Primitive), since `Fixed` is declared there.

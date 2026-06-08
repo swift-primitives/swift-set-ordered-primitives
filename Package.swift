@@ -20,10 +20,6 @@ let package = Package(
         .library(name: "Set Ordered Fixed Primitive", targets: ["Set Ordered Fixed Primitive"]),
         .library(name: "Set Ordered Fixed Primitives", targets: ["Set Ordered Fixed Primitives"]),
 
-        // MARK: - Static variant
-
-        // MARK: - Small variant
-
         // MARK: - Test Support
         .library(name: "Set Ordered Primitives Test Support", targets: ["Set Ordered Primitives Test Support"]),
     ],
@@ -95,10 +91,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Static type
-
-        // MARK: - Small type
-
         // MARK: - Fixed ops
         .target(
             name: "Set Ordered Fixed Primitives",
@@ -117,10 +109,6 @@ let package = Package(
                 .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
         ),
-
-        // MARK: - Static ops
-
-        // MARK: - Small ops
 
         // MARK: - Base ops + Umbrella ([MOD-005] dual-role: base conformances + re-export of all variants)
         .target(
