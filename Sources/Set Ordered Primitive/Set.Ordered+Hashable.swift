@@ -9,17 +9,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitives
-public import Set_Ordered_Fixed_Primitive
+// The S5 carrier — see `Set.Ordered+Equatable.swift` for the column-riding note.
+// `Shared: Hashable` combines count + the dense prefix in order, so equal ordered
+// sets (same members, same insertion order) hash equal.
 
-// MARK: - removeAll()
-
-extension Set.Ordered.Fixed where Element: Copyable {
-    /// Removes all elements from the set.
-    ///
-    /// The capacity remains unchanged.
+extension __SetOrdered: Hashable where S: Hashable {
     @inlinable
-    public mutating func removeAll() {
-        clear(keepingCapacity: false)
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(store)
     }
 }

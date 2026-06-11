@@ -12,165 +12,104 @@ let package = Package(
         .visionOS(.v26)
     ],
     products: [
-        // MARK: - Base
-        .library(name: "Set Ordered Primitive", targets: ["Set Ordered Primitive"]),
-        .library(name: "Set Ordered Primitives", targets: ["Set Ordered Primitives"]),
+        // MARK: - Type
+        .library(
+            name: "Set Ordered Primitive",
+            targets: ["Set Ordered Primitive"]
+        ),
 
-        // MARK: - Fixed variant
-        .library(name: "Set Ordered Fixed Primitive", targets: ["Set Ordered Fixed Primitive"]),
-        .library(name: "Set Ordered Fixed Primitives", targets: ["Set Ordered Fixed Primitives"]),
+        // MARK: - Umbrella
+        .library(
+            name: "Set Ordered Primitives",
+            targets: ["Set Ordered Primitives"]
+        ),
 
-        // MARK: - Test Support
-        .library(name: "Set Ordered Primitives Test Support", targets: ["Set Ordered Primitives Test Support"]),
+        // NB: the Fixed variant's products ("Set Ordered Fixed Primitive(s)") are
+        // WITHDRAWN at the W5 reshape: `Hash.Indexed`'s membership/probing engine is
+        // pinned to the heap dense column ([MEM-COPY-018] pin block) and its planes are
+        // package-scoped, so a bounded composition cannot be built from outside
+        // swift-hash-table-primitives today. The variant returns when the engine grows
+        // bounded pins. The Test Support shell is withdrawn too (no fixtures; no
+        // consumers).
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-primitives/swift-memory-small-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-memory-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-span-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-memory-iterator-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-set-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-bit-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
-        // W3 ⑤-(N): hash-table is reparam'd onto the (b-pin) Split-substrate Slots;
-        // path-dep the worktree so its closure (→ buffer-slots → reparam'd
-        // buffer-primitives) unifies under one identity (Finding 7/10).
-        .package(url: "https://github.com/swift-primitives/swift-hash-table-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-hash-primitives.git", branch: "main"),
-        // W2 mesh: buffer packages on their  worktrees so every path to memory
-        // unifies on identity swift-memory-primitives (collision resolved).
+        .package(url: "https://github.com/swift-primitives/swift-hash-table-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-shared-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
-        // The build capability: growable variants conform builder-primitives'
-        // generic `Buildable` (Initiable init() + add) for the free `{ … }` DSL;
-        // bounded variants drain its shared @Builder / Buffer<Element>.Linear
-        // accumulator. There is no set-specific Set.Buildable.Protocol/Set.Builder.
-        .package(url: "https://github.com/swift-primitives/swift-builder-primitives.git", branch: "main"),
-        // NOTE: swift-set-algebra-primitives is intentionally NOT a dependency of
-        // this package (library OR tests). The ordered-set discipline and the set
-        // algebra are orthogonal, mutually-independent concerns (set-builder ⊥
-        // set-algebra ⊥ set-ordered); algebra is tested in its own package against
-        // a buildable fixture, and composed at the consumer (import both packages).
-        .package(url: "https://github.com/swift-primitives/swift-property-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-ordinal-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-cardinal-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-finite-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-memory-heap-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-storage-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-store-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-memory-heap-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-memory-allocation-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-ordinal-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-tagged-primitives.git", branch: "main"),
+        // NOTE: swift-set-algebra-primitives is intentionally NOT a dependency.
+        // The ordered-set discipline and the set algebra are orthogonal concerns;
+        // consumers compose them by importing both packages.
     ],
     targets: [
 
-        // MARK: - Base type (Set.Ordered dynamic/heap + error enums)
+        // MARK: - Type (the hoisted `__SetOrdered<S>` template + the `Set<S>.Ordered`
+        // alias + the column-pinned construction trio + the S5 carriers)
         .target(
             name: "Set Ordered Primitive",
             dependencies: [
-                .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
-                .product(name: "Set Primitives", package: "swift-set-primitives"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
+                .product(name: "Set Primitive", package: "swift-set-primitives"),
+                .product(name: "Hash Indexed Primitive", package: "swift-hash-table-primitives"),
+                .product(name: "Hash Table Primitive", package: "swift-hash-table-primitives"),
+                .product(name: "Hash Primitives", package: "swift-hash-primitives"),
+                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
+                .product(name: "Buffer Primitive", package: "swift-buffer-primitives"),
+                .product(name: "Buffer Protocol Primitives", package: "swift-buffer-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
-                .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
-                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
-                .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
-            ]
-        ),
-
-        // MARK: - Fixed type
-        .target(
-            name: "Set Ordered Fixed Primitive",
-            dependencies: [
-                "Set Ordered Primitive",
-                .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
+                .product(name: "Storage Primitive", package: "swift-storage-primitives"),
+                .product(name: "Storage Contiguous Primitives", package: "swift-storage-primitives"),
+                .product(name: "Store Protocol Primitives", package: "swift-store-primitives"),
+                .product(name: "Memory Heap Primitives", package: "swift-memory-heap-primitives"),
+                .product(name: "Memory Allocator Primitive", package: "swift-memory-allocation-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Hash Table Primitives", package: "swift-hash-table-primitives"),
-                .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
-                .product(name: "Buffer Linear Bounded Primitives", package: "swift-buffer-linear-primitives"),
-                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
-                .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
             ]
         ),
 
-        // MARK: - Fixed ops
-        .target(
-            name: "Set Ordered Fixed Primitives",
-            dependencies: [
-                "Set Ordered Fixed Primitive",
-                "Set Ordered Primitive",
-                .product(name: "Memory Iterator Primitives", package: "swift-memory-iterator-primitives"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
-                .product(name: "Buffer Linear Bounded Primitives", package: "swift-buffer-linear-primitives"),
-                .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
-                .product(name: "Iterable", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
-                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
-                .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
-            ]
-        ),
-
-        // MARK: - Base ops + Umbrella ([MOD-005] dual-role: base conformances + re-export of all variants)
+        // MARK: - Umbrella ([MOD-005]: re-exports the in-package type target ONLY —
+        // zero cross-package re-exports; carries the column-generic ordered-read
+        // surface + the column-pinned membership/ordered ops)
         .target(
             name: "Set Ordered Primitives",
             dependencies: [
                 "Set Ordered Primitive",
-                "Set Ordered Fixed Primitives",
-                .product(name: "Memory Iterator Primitives", package: "swift-memory-iterator-primitives"),
-                .product(name: "Builder Primitives", package: "swift-builder-primitives"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .product(name: "Hash Indexed Primitive", package: "swift-hash-table-primitives"),
+                .product(name: "Hash Table Primitive", package: "swift-hash-table-primitives"),
+                .product(name: "Hash Primitives", package: "swift-hash-primitives"),
+                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
+                .product(name: "Buffer Primitive", package: "swift-buffer-primitives"),
+                .product(name: "Buffer Protocol Primitives", package: "swift-buffer-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
-                .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
-                .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
-                .product(name: "Iterable", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
-                .product(name: "Ordinal Primitives", package: "swift-ordinal-primitives"),
-                .product(name: "Cardinal Primitives", package: "swift-cardinal-primitives"),
+                .product(name: "Storage Primitive", package: "swift-storage-primitives"),
+                .product(name: "Storage Contiguous Primitives", package: "swift-storage-primitives"),
+                .product(name: "Store Protocol Primitives", package: "swift-store-primitives"),
+                .product(name: "Memory Heap Primitives", package: "swift-memory-heap-primitives"),
+                .product(name: "Memory Allocator Primitive", package: "swift-memory-allocation-primitives"),
+                .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .product(name: "Ordinal Primitives Standard Library Integration", package: "swift-ordinal-primitives"),
             ]
         ),
 
-        // MARK: - Test Support
-        .target(
-            name: "Set Ordered Primitives Test Support",
-            dependencies: [
-                "Set Ordered Primitives",
-                .product(name: "Bit Primitives Test Support", package: "swift-bit-primitives"),
-                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
-                .product(name: "Buffer Primitives Test Support", package: "swift-buffer-primitives"),
-            ],
-            path: "Tests/Support"
-        ),
-
-        // MARK: - Per-variant type tests ([TEST-033] topology B: one test target per
-        // variant TYPE module, exercising its hot-op surface in isolation; cross-variant
-        // + conformance tests live in the umbrella test target below)
-        .testTarget(
-            name: "Set Ordered Primitive Tests",
-            dependencies: [
-                "Set Ordered Primitive",
-                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
-                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
-            ]
-        ),
-
-        .testTarget(
-            name: "Set Ordered Fixed Primitive Tests",
-            dependencies: [
-                "Set Ordered Fixed Primitive",
-                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
-                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
-            ]
-        ),
-
-        // MARK: - Umbrella + cross-variant tests
+        // MARK: - Tests
         .testTarget(
             name: "Set Ordered Primitives Tests",
             dependencies: [
                 "Set Ordered Primitives",
-                "Set Ordered Primitives Test Support",
+                .product(name: "Hash Table Primitives Test Support", package: "swift-hash-table-primitives"),
+                .product(name: "Buffer Primitives Test Support", package: "swift-buffer-primitives"),
+                .product(name: "Hash Primitives Standard Library Integration", package: "swift-hash-primitives"),
+                .product(name: "Tagged Primitives Standard Library Integration", package: "swift-tagged-primitives"),
+                .product(name: "Ordinal Primitives Standard Library Integration", package: "swift-ordinal-primitives"),
             ]
-        )
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
