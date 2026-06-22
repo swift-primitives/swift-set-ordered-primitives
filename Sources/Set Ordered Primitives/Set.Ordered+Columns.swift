@@ -39,7 +39,7 @@ extension __SetOrdered where S: ~Copyable {
     @inlinable
     @discardableResult
     public mutating func insert<E: Hash.Key & ~Copyable>(_ element: consuming E) -> E?
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         store.insert(element)
     }
 
@@ -50,7 +50,7 @@ extension __SetOrdered where S: ~Copyable {
     @inlinable
     @discardableResult
     public mutating func insert<E: Hash.Key & ~Copyable>(_ element: consuming E) -> E?
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>> {
+    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         store.withUnique(consuming: element) { column, element in
             column.insert(element)
         }
@@ -67,7 +67,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(1) average
     @inlinable
     public func contains<E: Hash.Key & ~Copyable>(_ element: borrowing E) -> Bool
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         store.contains(element)
     }
 
@@ -77,7 +77,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(1) average
     @inlinable
     public func contains<E: Hash.Key & ~Copyable>(_ element: borrowing E) -> Bool
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>> {
+    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         store.withColumn { $0.contains(element) }
     }
 }
@@ -93,7 +93,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(1) average
     @inlinable
     public func index<E: Hash.Key & ~Copyable>(of element: borrowing E) -> Index<E>?
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         store.position(of: element)
     }
 
@@ -103,7 +103,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(1) average
     @inlinable
     public func index<E: Hash.Key & ~Copyable>(of element: borrowing E) -> Index<E>?
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>> {
+    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         store.withColumn { $0.position(of: element) }
     }
 }
@@ -119,31 +119,31 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(n) from the removal point (order preservation)
     @inlinable
     public mutating func remove<E: Hash.Key & ~Copyable>(_ element: borrowing E) -> E?
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         store.remove(element)
     }
 
     /// Removes the equal member (`Shared` column; uniqueness restored first).
     @inlinable
     public mutating func remove<E: Hash.Key & ~Copyable>(_ element: borrowing E) -> E?
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>> {
+    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         store.withUnique { $0.remove(element) }
     }
 
     /// Removes all members (direct column).
     @inlinable
     public mutating func removeAll<E: Hash.Key & ~Copyable>(keepingCapacity: Bool = true)
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         store.removeAll(keepingCapacity: keepingCapacity)
     }
 
     /// Removes all members (`Shared` column; detaches first — siblings keep theirs).
     @inlinable
     public mutating func removeAll<E: Hash.Key & SendableMetatype>(keepingCapacity: Bool = true)
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>> {
+    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         let capacity: Index<E>.Count = keepingCapacity ? store.capacity : .zero
         self.store = Shared(
-            Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>(minimumCapacity: capacity)
+            Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: capacity)
         )
     }
 }
@@ -158,7 +158,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(n)
     @inlinable
     public func forEach<E: Hash.Key & ~Copyable>(_ body: (borrowing E) -> Void)
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         store.forEach(body)
     }
 
@@ -167,7 +167,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(n)
     @inlinable
     public func forEach<E: Hash.Key & ~Copyable>(_ body: (borrowing E) -> Void)
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear>> {
+    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         store.withColumn { $0.forEach(body) }
     }
 
@@ -176,7 +176,7 @@ extension __SetOrdered where S: ~Copyable {
     /// - Complexity: O(`capacity`)
     @inlinable
     public func clone<E: Hash.Key>() -> Self
-    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<E>>.Linear> {
+    where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
         Self(store: store.clone())
     }
 }
