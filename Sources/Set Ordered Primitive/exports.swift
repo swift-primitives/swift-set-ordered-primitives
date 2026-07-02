@@ -9,8 +9,9 @@
 //
 // ===----------------------------------------------------------------------===//
 
-// Set Ordered Primitive declares the order-facing discipline: the hoisted
-// column-generic `__SetOrdered<S>` template, its `Set<S>.Ordered` alias, the
+// Set Ordered Primitive declares the order-facing discipline: the hoisted,
+// bound-free carrier `__SetOrdered<S: ~Copyable>` ([DS-025]), its
+// `Set<E>.Ordered` front door (a [DS-028] nest alias on the `__Set` carrier), the
 // pinned construction trio, and the S5 `Equatable`/`Hashable` carriers. The
 // generic ordered-read surface and the pinned membership/ordered ops live in the
 // umbrella target. Zero re-exports here (leg-8 narrow-exports standard): the

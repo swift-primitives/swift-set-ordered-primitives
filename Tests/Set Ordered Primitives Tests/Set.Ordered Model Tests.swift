@@ -28,8 +28,8 @@ private typealias HeapStorage<E: ~Copyable> =
 private typealias OrderedColumn<E: Hash.Key & ~Copyable> =
     Hash.Indexed<Buffer<HeapStorage<E>>.Linear>
 
-private typealias MoveOrdered<E: Hash.Key & ~Copyable> = Set<OrderedColumn<E>>.Ordered
-private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = Set<Shared<E, OrderedColumn<E>>>.Ordered
+private typealias MoveOrdered<E: Hash.Key & ~Copyable> = Set<E>.Ordered
+private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = __Set<Shared<E, OrderedColumn<E>>>.Ordered
 
 // MARK: - Fixtures (the hoisted move-only element + the refcounted fleet member)
 

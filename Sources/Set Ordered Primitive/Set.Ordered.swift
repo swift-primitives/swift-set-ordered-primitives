@@ -12,8 +12,6 @@
 public import Set_Primitive
 public import Buffer_Primitive
 public import Buffer_Linear_Primitive
-public import Buffer_Protocol_Primitives
-public import Store_Protocol_Primitives
 public import Storage_Primitive
 public import Storage_Contiguous_Primitives
 public import Memory_Heap_Primitives
@@ -25,23 +23,23 @@ public import Index_Primitives
 
 // MARK: - Set.Ordered (the ORDER-FACING ADT — generic over the ORDERED HASHED column)
 
-extension Set where S: ~Copyable {
-    /// The ordered-set discipline over the `Hash.Indexed` column — the base `Set<S>`'s
+extension __Set where S: ~Copyable {
+    /// The ordered-set discipline over the `Hash.Indexed` column — the base set's
     /// sibling that puts the column's insertion order ON the surface (the W5 reshape,
     /// 2026-06-11).
     ///
-    /// The base `Set<S>` already ITERATES in insertion order (the dense plane is the
+    /// The base set already ITERATES in insertion order (the dense plane is the
     /// order); what it deliberately does not expose is the ORDER-FACING vocabulary.
     /// `Set.Ordered` exists for exactly that surface: positional reads
     /// (`subscript(index:)`, `first`, `last`) and position lookup (`index(of:)`) over
     /// the same membership discipline.
     ///
-    /// The ratified two-column design, mirrored from `Set<S>`: copyability flows from
+    /// The ratified two-column design, mirrored from `__Set`: copyability flows from
     /// the column (S5):
     ///
     /// ```swift
-    /// Set<            Hash.Indexed<Buffer<Storage<…System>.Contiguous<FD >>.Linear>>.Ordered   // zero-cost MOVE-ONLY (default)
-    /// Set<Shared<Int, Hash.Indexed<Buffer<Storage<…System>.Contiguous<Int>>.Linear>>>.Ordered  // explicit CoW value semantics
+    /// Set<Int>.Ordered                                                            // zero-cost MOVE-ONLY (default, front door)
+    /// __Set<Shared<Int, Hash.Indexed<Buffer<Storage<…System>.Contiguous<Int>>.Linear>>>.Ordered  // explicit CoW value semantics
     /// ```
     ///
     /// The column is `Hash.Indexed<Dense>`: members live DENSELY in insertion order;
@@ -49,26 +47,30 @@ extension Set where S: ~Copyable {
     /// one box, one clone strategy. Members never mutate in place (mutability ruling
     /// (a)): the surface is insert / contains / remove / read-only positional access.
     ///
-    /// ## Hoisted ADT Pattern
+    /// ## Nest alias on the carrier ([DS-028])
     ///
-    /// `Set` is a GENERIC namespace, so the discipline is declared at module scope as
-    /// `__SetOrdered<S>` and aliased into the namespace re-applying the column
-    /// parameter (the `Hash.Indexed` / `Set.Protocol` hoist idiom, [PKG-NAME-006]):
+    /// `Set.Ordered` is a column-preserving nest alias on the hoisted carrier `__Set`,
+    /// re-applying the column parameter `S` to the sibling carrier `__SetOrdered`. The
+    /// public front door is `Set<E>.Ordered` (over the canonical column):
     ///
     /// ```swift
-    /// extension Set where S: ~Copyable {
+    /// extension __Set where S: ~Copyable {
     ///     public typealias Ordered = __SetOrdered<S>
     /// }
     /// ```
     public typealias Ordered = __SetOrdered<S>
 }
 
-/// See ``Set/Ordered``. (Hoisted: `Set` is a generic namespace; the hoist keeps the
-/// decl symmetrical with the family ADTs — `Set<S>`, `Dictionary<S>` — and the alias
-/// canonical.)
+/// See ``Set/Ordered``. The order-facing sibling carrier, hoisted bound-free per
+/// [DS-025] ([API-IMPL-009]/[PKG-NAME-006]): its column parameter `S` is bound
+/// `~Copyable` **only**; every capability (observability, the ordered-read surface,
+/// membership, construction) attaches by conditional `@inlinable` extension keyed on
+/// the seams the column conforms. The public spelling is the `Set<E>.Ordered` front
+/// door (a [DS-028] nest alias on `__Set`); the hoisted name never appears in
+/// consumer signatures.
+@_documentation(visibility: public)
 @frozen
-public struct __SetOrdered<S: Store.`Protocol` & Buffer.`Protocol` & ~Copyable>: ~Copyable
-where S.Count == Index_Primitives.Index<S.Element>.Count, S.Element: Hash.Key {
+public struct __SetOrdered<S: ~Copyable>: ~Copyable {
 
     /// The ordered hashed column — move-only (the default ownership column) or a
     /// `Shared` CoW column. The ADT is a thin order-facing discipline over it; it
@@ -91,7 +93,7 @@ where S.Count == Index_Primitives.Index<S.Element>.Count, S.Element: Hash.Key {
 
 // MARK: - Conditional Conformances (co-located per [COPY-FIX-004])
 
-/// The S5 chain: `Set<Shared<E, B>>.Ordered` is `Copyable` exactly when the ELEMENT is.
+/// The S5 chain: `__Set<Shared<E, B>>.Ordered` is `Copyable` exactly when the ELEMENT is.
 extension __SetOrdered: Copyable where S: Copyable {}
 
 extension __SetOrdered: Sendable where S: Sendable & ~Copyable {}

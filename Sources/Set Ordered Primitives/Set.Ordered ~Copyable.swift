@@ -10,10 +10,11 @@
 // ===----------------------------------------------------------------------===//
 
 // The COLUMN-GENERIC ordered surface: the count vocabulary AND the ordered-READ
-// vocabulary ride the template bound — positional access needs only the seam's
-// element `_read` (`Store.Protocol`) plus the ledgered `count` (`Buffer.Protocol`),
-// and `Shared`'s `_read` witness is gate-free, so one declaration serves both
-// columns. The ENGINE-touching ops (membership, position lookup) pin per column
+// vocabulary ride the seam bound (restated on the extensions now that `__SetOrdered`
+// is the bound-free carrier) — positional access needs only the seam's element
+// `_read` (`Store.Protocol`) plus the ledgered `count` (`Buffer.Protocol`), and
+// `Shared`'s `_read` witness is gate-free, so one declaration serves both columns.
+// The ENGINE-touching ops (membership, position lookup) pin per column
 // (`Set.Ordered+Columns.swift`) — they reach the engine, which only the concrete
 // composite exposes. No element mutation doors (mutability ruling (a)): the
 // positional subscript is `_read`-only.
@@ -23,7 +24,8 @@ public import Store_Protocol_Primitives
 public import Index_Primitives
 import Ordinal_Primitives_Standard_Library_Integration
 
-extension __SetOrdered where S: ~Copyable {
+extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol`,
+    S.Count == Index<S.Element>.Count {
     /// The number of members.
     @inlinable
     public var count: Index<S.Element>.Count { store.count }
@@ -39,7 +41,8 @@ extension __SetOrdered where S: ~Copyable {
 
 // MARK: - Positional reads (insertion order; the package's reason to exist)
 
-extension __SetOrdered where S: ~Copyable {
+extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol`,
+    S.Count == Index<S.Element>.Count {
     /// Reads the member at the given insertion-order position (a borrowing read;
     /// there is no positional write — mutability ruling (a)).
     ///
@@ -54,7 +57,8 @@ extension __SetOrdered where S: ~Copyable {
     }
 }
 
-extension __SetOrdered where S: ~Copyable, S.Element: Copyable {
+extension __SetOrdered where S: ~Copyable, S.Element: Copyable, S: Store.`Protocol` & Buffer.`Protocol`,
+    S.Count == Index<S.Element>.Count {
     /// The oldest-inserted member, or `nil` if the set is empty.
     ///
     /// - Complexity: O(1)
@@ -75,7 +79,7 @@ extension __SetOrdered where S: ~Copyable, S.Element: Copyable {
 
 // MARK: - Cloning (generic on the CoW column)
 
-extension __SetOrdered where S: Copyable {
+extension __SetOrdered where S: Copyable, S: Store.`Protocol` {
     /// Returns an independent copy of this ordered set with its own storage (the
     /// mutation gate on the fresh copy ALWAYS installs a deep copy).
     ///
