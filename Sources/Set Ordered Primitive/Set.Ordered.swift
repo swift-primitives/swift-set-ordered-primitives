@@ -18,7 +18,7 @@ public import Memory_Heap_Primitives
 public import Memory_Allocator_Primitive
 public import Hash_Indexed_Primitive
 import Hash_Primitives
-public import Shared_Primitive
+public import Ownership_Shared_Primitive
 public import Index_Primitives
 
 // MARK: - Set.Ordered (the ORDER-FACING ADT — generic over the ORDERED HASHED column)
@@ -39,7 +39,7 @@ extension __Set where S: ~Copyable {
     ///
     /// ```swift
     /// Set<Int>.Ordered                                                            // zero-cost MOVE-ONLY (default, front door)
-    /// __Set<Shared<Int, Hash.Indexed<Buffer<Storage<…System>.Contiguous<Int>>.Linear>>>.Ordered  // explicit CoW value semantics
+    /// __Set<Ownership.Shared<Int, Hash.Indexed<Buffer<Storage<…System>.Contiguous<Int>>.Linear>>>.Ordered  // explicit CoW value semantics
     /// ```
     ///
     /// The column is `Hash.Indexed<Dense>`: members live DENSELY in insertion order;
@@ -93,7 +93,7 @@ public struct __SetOrdered<S: ~Copyable>: ~Copyable {
 
 // MARK: - Conditional Conformances (co-located per [COPY-FIX-004])
 
-/// The S5 chain: `__Set<Shared<E, B>>.Ordered` is `Copyable` exactly when the ELEMENT is.
+/// The S5 chain: `__Set<Ownership.Shared<E, B>>.Ordered` is `Copyable` exactly when the ELEMENT is.
 extension __SetOrdered: Copyable where S: Copyable {}
 
 extension __SetOrdered: Sendable where S: Sendable & ~Copyable {}
@@ -112,8 +112,8 @@ extension __SetOrdered where S: ~Copyable {
     /// Creates an empty CoW (value-semantic) ordered set on the `Shared` column.
     @inlinable
     public init<E: Hash.Key & SendableMetatype>(minimumCapacity: Index_Primitives.Index<E>.Count = .zero)
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
-        self.init(store: Shared(
+    where S == Ownership.Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
+        self.init(store: Ownership.Shared(
             Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: minimumCapacity)
         ))
     }
@@ -122,8 +122,8 @@ extension __SetOrdered where S: ~Copyable {
     /// `Shared` column (the boxed flavor of the move-only regime).
     @inlinable
     public init<E: Hash.Key & SendableMetatype & ~Copyable>(minimumCapacity: Index_Primitives.Index<E>.Count = .zero)
-    where S == Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
-        self.init(store: Shared(
+    where S == Ownership.Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
+        self.init(store: Ownership.Shared(
             Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: minimumCapacity)
         ))
     }

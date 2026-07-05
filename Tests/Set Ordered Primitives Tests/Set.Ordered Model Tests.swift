@@ -9,7 +9,7 @@ import Storage_Primitive
 import Storage_Contiguous_Primitives
 import Memory_Heap_Primitives
 import Memory_Allocator_Primitive
-import Shared_Primitive
+import Ownership_Shared_Primitive
 import Index_Primitives
 import Tagged_Primitives_Standard_Library_Integration
 import Ordinal_Primitives_Standard_Library_Integration
@@ -29,7 +29,7 @@ private typealias OrderedColumn<E: Hash.Key & ~Copyable> =
     Hash.Indexed<Buffer<HeapStorage<E>>.Linear>
 
 private typealias MoveOrdered<E: Hash.Key & ~Copyable> = Set<E>.Ordered
-private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = __Set<Shared<E, OrderedColumn<E>>>.Ordered
+private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = __Set<Ownership.Shared<E, OrderedColumn<E>>>.Ordered
 
 // MARK: - Fixtures (the hoisted move-only element + the refcounted fleet member)
 
