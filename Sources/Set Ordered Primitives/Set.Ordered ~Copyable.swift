@@ -24,8 +24,7 @@ public import Store_Protocol_Primitives
 public import Index_Primitives
 import Ordinal_Primitives_Standard_Library_Integration
 
-extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol`,
-    S.Count == Index<S.Element>.Count {
+extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol` {
     /// The number of members.
     @inlinable
     public var count: Index<S.Element>.Count { store.count }
@@ -41,8 +40,7 @@ extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protoco
 
 // MARK: - Positional reads (insertion order; the package's reason to exist)
 
-extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol`,
-    S.Count == Index<S.Element>.Count {
+extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol` {
     /// Reads the member at the given insertion-order position (a borrowing read;
     /// there is no positional write — mutability ruling (a)).
     ///
@@ -57,8 +55,7 @@ extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protoco
     }
 }
 
-extension __SetOrdered where S: ~Copyable, S.Element: Copyable, S: Store.`Protocol` & Buffer.`Protocol`,
-    S.Count == Index<S.Element>.Count {
+extension __SetOrdered where S: ~Copyable, S.Element: Copyable, S: Store.`Protocol` & Buffer.`Protocol` {
     /// The oldest-inserted member, or `nil` if the set is empty.
     ///
     /// - Complexity: O(1)
