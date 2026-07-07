@@ -14,6 +14,7 @@
 // sets (same members, same insertion order) hash equal.
 
 extension __SetOrdered: Hashable where S: Hashable {
+    /// Hashes the essential components of this ordered set into the given hasher.
     @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(store)

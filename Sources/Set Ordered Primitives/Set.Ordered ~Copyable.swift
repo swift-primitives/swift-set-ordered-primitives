@@ -18,11 +18,11 @@
 // (`Set.Ordered+Columns.swift`) — they reach the engine, which only the concrete
 // composite exposes. No element mutation doors (mutability ruling (a)): the
 // positional subscript is `_read`-only.
-public import Set_Ordered_Primitive
 public import Buffer_Protocol_Primitives
-public import Store_Protocol_Primitives
 public import Index_Primitives
 import Ordinal_Primitives_Standard_Library_Integration
+public import Set_Ordered_Primitive
+public import Store_Protocol_Primitives
 
 extension __SetOrdered where S: ~Copyable, S: Store.`Protocol` & Buffer.`Protocol` {
     /// The number of members.

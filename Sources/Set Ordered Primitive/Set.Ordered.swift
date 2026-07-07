@@ -9,17 +9,17 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Set_Primitive
-public import Buffer_Primitive
 public import Buffer_Linear_Primitive
-public import Storage_Primitive
-public import Storage_Contiguous_Primitives
-public import Memory_Heap_Primitives
-public import Memory_Allocator_Primitive
+public import Buffer_Primitive
 public import Hash_Indexed_Primitive
 import Hash_Primitives
-public import Ownership_Shared_Primitive
 public import Index_Primitives
+public import Memory_Allocator_Primitive
+public import Memory_Heap_Primitives
+public import Ownership_Shared_Primitive
+public import Set_Primitive
+public import Storage_Contiguous_Primitives
+public import Storage_Primitive
 
 // MARK: - Set.Ordered (the ORDER-FACING ADT — generic over the ORDERED HASHED column)
 
@@ -61,7 +61,9 @@ extension __Set where S: ~Copyable {
     public typealias Ordered = __SetOrdered<S>
 }
 
-/// See ``Set/Ordered``. The order-facing sibling carrier, hoisted bound-free per
+/// See ``Set/Ordered``.
+///
+/// The order-facing sibling carrier, hoisted bound-free per
 /// [DS-025] ([API-IMPL-009]/[PKG-NAME-006]): its column parameter `S` is bound
 /// `~Copyable` **only**; every capability (observability, the ordered-read surface,
 /// membership, construction) attaches by conditional `@inlinable` extension keyed on
@@ -73,7 +75,9 @@ extension __Set where S: ~Copyable {
 public struct __SetOrdered<S: ~Copyable>: ~Copyable {
 
     /// The ordered hashed column — move-only (the default ownership column) or a
-    /// `Shared` CoW column. The ADT is a thin order-facing discipline over it; it
+    /// `Shared` CoW column.
+    ///
+    /// The ADT is a thin order-facing discipline over it; it
     /// carries NO deinit.
     @usableFromInline
     package var store: S
@@ -113,9 +117,11 @@ extension __SetOrdered where S: ~Copyable {
     @inlinable
     public init<E: Hash.Key & SendableMetatype>(minimumCapacity: Index_Primitives.Index<E>.Count = .zero)
     where S == Ownership.Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
-        self.init(store: Ownership.Shared(
-            Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: minimumCapacity)
-        ))
+        self.init(
+            store: Ownership.Shared(
+                Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: minimumCapacity)
+            )
+        )
     }
 
     /// Creates an empty statically-unique ordered set of move-only members on the
@@ -123,8 +129,10 @@ extension __SetOrdered where S: ~Copyable {
     @inlinable
     public init<E: Hash.Key & SendableMetatype & ~Copyable>(minimumCapacity: Index_Primitives.Index<E>.Count = .zero)
     where S == Ownership.Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
-        self.init(store: Ownership.Shared(
-            Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: minimumCapacity)
-        ))
+        self.init(
+            store: Ownership.Shared(
+                Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>(minimumCapacity: minimumCapacity)
+            )
+        )
     }
 }

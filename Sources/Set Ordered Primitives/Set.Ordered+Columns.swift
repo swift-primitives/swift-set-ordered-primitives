@@ -13,18 +13,18 @@
 // the box via the gate-first scoped accessors ([MEM-OWN-017]: inserted members
 // thread as consuming closure PARAMETERS). The seam/engine stays inside
 // `Hash.Indexed` — this discipline composes its public ops, never its planes.
-public import Set_Ordered_Primitive
-public import Buffer_Primitive
 public import Buffer_Linear_Primitive
-public import Storage_Primitive
-public import Storage_Contiguous_Primitives
-public import Memory_Heap_Primitives
-public import Memory_Allocator_Primitive
+public import Buffer_Primitive
 public import Hash_Indexed_Primitive
-import Hash_Table_Primitive
 import Hash_Primitives
-public import Ownership_Shared_Primitive
+import Hash_Table_Primitive
 public import Index_Primitives
+public import Memory_Allocator_Primitive
+public import Memory_Heap_Primitives
+public import Ownership_Shared_Primitive
+public import Set_Ordered_Primitive
+public import Storage_Contiguous_Primitives
+public import Storage_Primitive
 
 // ============================================================================
 // MARK: - Insert (duplicate hand-back — move-only honesty; insertion appends)
@@ -113,8 +113,10 @@ extension __SetOrdered where S: ~Copyable {
 // ============================================================================
 
 extension __SetOrdered where S: ~Copyable {
-    /// Removes the equal member; returns it, or `nil` if absent. Every later member
-    /// shifts down one position — insertion order is preserved (direct column).
+    /// Removes the equal member; returns it, or `nil` if absent.
+    ///
+    /// Every later member shifts down one position — insertion order is preserved
+    /// (direct column).
     ///
     /// - Complexity: O(n) from the removal point (order preservation)
     @inlinable
@@ -152,6 +154,13 @@ extension __SetOrdered where S: ~Copyable {
 // MARK: - Iteration (insertion order) + direct clone
 // ============================================================================
 
+// swift-format-ignore
+// AmbiguousTrailingClosureOverload false-positive: the two `forEach` overloads
+// below are distinguished by mutually exclusive `where S == ...` constraints, so
+// exactly one applies for any concrete `S` — the same column-pinned pattern as
+// `insert`/`contains`/`remove`/`removeAll` above (unflagged, since those don't
+// take a closure). Split into its own extension so the ignore doesn't also
+// blanket-cover `clone()` below.
 extension __SetOrdered where S: ~Copyable {
     /// Calls the closure for each member, in insertion order (direct column).
     ///
@@ -170,7 +179,9 @@ extension __SetOrdered where S: ~Copyable {
     where S == Ownership.Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
         store.withColumn { $0.forEach(body) }
     }
+}
 
+extension __SetOrdered where S: ~Copyable {
     /// Returns an independent copy (direct column).
     ///
     /// - Complexity: O(`capacity`)

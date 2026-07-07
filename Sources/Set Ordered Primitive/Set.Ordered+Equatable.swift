@@ -17,6 +17,7 @@
 // so the conformance never fires for them — capability flows from the column.
 
 extension __SetOrdered: Equatable where S: Equatable {
+    /// Returns whether two ordered sets hold equal members in equal insertion order.
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.store == rhs.store
