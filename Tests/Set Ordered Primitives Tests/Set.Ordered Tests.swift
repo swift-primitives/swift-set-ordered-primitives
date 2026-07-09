@@ -34,7 +34,7 @@ private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = __Set<Ownership.S
 // MARK: - [DS-024] + coherence (the Shared composite is this family's column)
 
 @Suite
-struct SetOrderedColumnLawTests {
+struct `Set.Ordered Column Law Tests` {
 
     @Test
     func `the shared ordered-hashed column obeys the seam ledger laws`() {
@@ -83,7 +83,7 @@ extension Hash.Indexed<Buffer<HeapStorage<Int>>.Linear> {
 // MARK: - Core membership (both columns)
 
 @Suite(.serialized)
-struct SetOrderedCoreTests {
+struct `Set.Ordered Core Tests` {
 
     @Test
     func `insert, contains, duplicate hand-back, remove, counts`() {
@@ -145,7 +145,7 @@ struct SetOrderedCoreTests {
 // MARK: - The ORDER-FACING surface (positional reads + position lookup)
 
 @Suite(.serialized)
-struct SetOrderedOrderTests {
+struct `Set.Ordered Order Tests` {
 
     @Test
     func `positional subscript reads insertion order, both columns`() {
@@ -250,7 +250,7 @@ struct SetOrderedOrderTests {
 // MARK: - CoW value semantics (the Shared composite column)
 
 @Suite(.serialized)
-struct SetOrderedCoWTests {
+struct `Set.Ordered CoW Tests` {
 
     @Test
     func `copies share until mutation; inserts detach through the box`() {
@@ -330,7 +330,7 @@ struct SetOrderedCoWTests {
 // MARK: - Move-only members: positional surface + teardown oracles
 
 @Suite(.serialized)
-struct SetOrderedTeardownTests {
+struct `Set.Ordered Teardown Tests` {
 
     @Test
     func `move-only members flow through and tear down exactly once`() {
@@ -439,7 +439,7 @@ extension OrderedProbe2 {
 // MARK: - Sendable smoke
 
 @Suite
-struct SetOrderedSendableTests {
+struct `Set.Ordered Sendable Tests` {
 
     @Test
     func `sendable composes through both columns`() {
