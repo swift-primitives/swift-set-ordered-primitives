@@ -402,7 +402,9 @@ extension OrderedItem: Hash.`Protocol` {
     }
 }
 
-private enum OrderedProbe {
+private enum OrderedProbe {}
+
+extension OrderedProbe {
     nonisolated(unsafe) static var _destroyed: [Int] = []
     static func reset() { unsafe _destroyed = [] }
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }
@@ -425,7 +427,9 @@ extension OrderedItem2: Hash.`Protocol` {
     }
 }
 
-private enum OrderedProbe2 {
+private enum OrderedProbe2 {}
+
+extension OrderedProbe2 {
     nonisolated(unsafe) static var _destroyed: [Int] = []
     static func reset() { unsafe _destroyed = [] }
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }
