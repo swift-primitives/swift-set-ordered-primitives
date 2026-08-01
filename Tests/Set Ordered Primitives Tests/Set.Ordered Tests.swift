@@ -28,7 +28,6 @@ private typealias HeapStorage<E: ~Copyable> =
 private typealias OrderedColumn<E: Hash.Key & ~Copyable> =
     Hash.Indexed<Buffer<HeapStorage<E>>.Linear>
 
-
 // MARK: - [DS-024] + coherence (the Shared composite is this family's column)
 
 @Suite
@@ -36,7 +35,6 @@ struct `Set.Ordered Column Law Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
-
 
     @Test
     func `the shared ordered-hashed column obeys the seam ledger laws`() {
@@ -89,7 +87,6 @@ struct `Set.Ordered Core Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
-
 
     @Test
     func `insert, contains, duplicate hand-back, remove, counts`() {
@@ -155,7 +152,6 @@ struct `Set.Ordered Order Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
-
 
     @Test
     func `positional subscript reads insertion order, both columns`() {
@@ -265,7 +261,6 @@ struct `Set.Ordered CoW Tests` {
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
 
-
     @Test
     func `copies share until mutation; inserts detach through the box`() {
         var a = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
@@ -348,7 +343,6 @@ struct `Set.Ordered Teardown Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
-
 
     @Test
     func `move-only members flow through and tear down exactly once`() {
@@ -467,7 +461,6 @@ struct `Set.Ordered Sendable Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
-
 
     @Test
     func `sendable composes through both columns`() {

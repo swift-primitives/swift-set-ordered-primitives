@@ -28,7 +28,6 @@ private typealias HeapStorage<E: ~Copyable> =
 private typealias OrderedColumn<E: Hash.Key & ~Copyable> =
     Hash.Indexed<Buffer<HeapStorage<E>>.Linear>
 
-
 // MARK: - Fixtures (the hoisted move-only element + the refcounted fleet member)
 
 extension Model.Element.Tracked: @retroactive Hash.`Protocol` {
