@@ -28,8 +28,6 @@ private typealias HeapStorage<E: ~Copyable> =
 private typealias OrderedColumn<E: Hash.Key & ~Copyable> =
     Hash.Indexed<Buffer<HeapStorage<E>>.Linear>
 
-private typealias MoveOrdered<E: Hash.Key & ~Copyable> = Set<E>.Ordered
-private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = __Set<Ownership.Shared<E, OrderedColumn<E>>>.Ordered
 
 // MARK: - Fixtures (the hoisted move-only element + the refcounted fleet member)
 
@@ -110,7 +108,7 @@ extension Reference {
 // MARK: - The direct move-only stream (order + position doors)
 
 private struct DirectStream: ~Copyable {
-    var set: MoveOrdered<Model.Element.Tracked>
+    var set: Set<Model.Element.Tracked>.Ordered
     var model = Reference()
     var rng: Model.Random
     var verdict: Model.Verdict
@@ -120,7 +118,7 @@ private struct DirectStream: ~Copyable {
 
     init(seed: UInt64, census: Model.Census) {
         var rng = Model.Random(seed: seed)
-        self.set = MoveOrdered<Model.Element.Tracked>(
+        self.set = Set<Model.Element.Tracked>.Ordered(
             minimumCapacity: Index<Model.Element.Tracked>.Count(UInt(rng.below(17)))
         )
         self.rng = rng
@@ -306,7 +304,7 @@ private func runDirectStream(seed: UInt64) -> Model.Verdict {
 // MARK: - The Shared (CoW) sibling fleet
 
 private struct FleetStream {
-    var siblings: [CoWOrdered<Member>]
+    var siblings: [__Set<Ownership.Shared<Member, OrderedColumn<Member>>>.Ordered]
     var models: [Reference]
     var rng: Model.Random
     var verdict: Model.Verdict
@@ -317,7 +315,7 @@ private struct FleetStream {
     init(seed: UInt64, census: Model.Census) {
         var rng = Model.Random(seed: seed)
         self.siblings = [
-            CoWOrdered<Member>(
+            __Set<Ownership.Shared<Member, OrderedColumn<Member>>>.Ordered(
                 minimumCapacity: Index<Member>.Count(UInt(rng.below(9)))
             )
         ]
@@ -510,8 +508,8 @@ extension `Set.Ordered Model`.Unit {
     @Test
     func `index(of:) tracks the backward-shift: positions compact after removal`() {
         let census = Model.Census()
-        var set = MoveOrdered<Model.Element.Tracked>(minimumCapacity: Index<Model.Element.Tracked>.Count(8))
-        for id in 0..<6 {
+        var set = Set<Model.Element.Tracked>.Ordered(minimumCapacity: Index<Model.Element.Tracked>.Count(8))
+        (0..<6).forEach { id in
             set.insert(Model.Element.Tracked(id: id, group: id / 2, census: census))
         }
         _ = set.remove(Model.Element.Tracked(id: 2, group: 1, census: census))
@@ -532,7 +530,7 @@ extension `Set.Ordered Model`.`Edge Case` {
     @Test
     func `a sibling's removal does not move the other sibling's positions`() {
         let census = Model.Census()
-        var first = CoWOrdered<Member>(minimumCapacity: Index<Member>.Count(4))
+        var first = __Set<Ownership.Shared<Member, OrderedColumn<Member>>>.Ordered(minimumCapacity: Index<Member>.Count(4))
         first.insert(Member(id: 1, group: 0, census: census))
         first.insert(Member(id: 2, group: 0, census: census))
         first.insert(Member(id: 3, group: 0, census: census))
@@ -541,10 +539,10 @@ extension `Set.Ordered Model`.`Edge Case` {
         _ = second.remove(Member(id: 1, group: 0, census: census))
 
         let secondTwo = second.index(of: Member(id: 2, group: 0, census: census))
-        #expect(secondTwo == Index<Member>(Ordinal(UInt(0))))
+        #expect(secondTwo == 0)
         let firstTwo = first.index(of: Member(id: 2, group: 0, census: census))
-        #expect(firstTwo == Index<Member>(Ordinal(UInt(1))))
+        #expect(firstTwo == 1)
         let firstOne = first.index(of: Member(id: 1, group: 0, census: census))
-        #expect(firstOne == Index<Member>(Ordinal(UInt(0))))
+        #expect(firstOne == 0)
     }
 }

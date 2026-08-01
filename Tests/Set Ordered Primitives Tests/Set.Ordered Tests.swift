@@ -28,13 +28,15 @@ private typealias HeapStorage<E: ~Copyable> =
 private typealias OrderedColumn<E: Hash.Key & ~Copyable> =
     Hash.Indexed<Buffer<HeapStorage<E>>.Linear>
 
-private typealias MoveOrdered<E: Hash.Key & ~Copyable> = Set<E>.Ordered
-private typealias CoWOrdered<E: Hash.Key & SendableMetatype> = __Set<Ownership.Shared<E, OrderedColumn<E>>>.Ordered
 
 // MARK: - [DS-024] + coherence (the Shared composite is this family's column)
 
 @Suite
 struct `Set.Ordered Column Law Tests` {
+    @Suite struct Unit {}
+    @Suite struct `Edge Case` {}
+    @Suite struct Integration {}
+
 
     @Test
     func `the shared ordered-hashed column obeys the seam ledger laws`() {
@@ -47,7 +49,7 @@ struct `Set.Ordered Column Law Tests` {
 
     @Test
     func `coherence holds through the ordered surface, direct column`() {
-        var direct = MoveOrdered<Int>(minimumCapacity: 4)
+        var direct = Set<Int>.Ordered(minimumCapacity: 4)
         var i = 0
         while i < 16 {
             direct.insert(i &* 3)
@@ -61,7 +63,7 @@ struct `Set.Ordered Column Law Tests` {
 
     @Test
     func `coherence holds through the ordered surface, shared column`() {
-        var shared = CoWOrdered<Int>(minimumCapacity: 4)
+        var shared = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         var i = 0
         while i < 16 {
             shared.insert(i &* 5)
@@ -84,10 +86,14 @@ extension Hash.Indexed<Buffer<HeapStorage<Int>>.Linear> {
 
 @Suite(.serialized)
 struct `Set.Ordered Core Tests` {
+    @Suite struct Unit {}
+    @Suite struct `Edge Case` {}
+    @Suite struct Integration {}
+
 
     @Test
     func `insert, contains, duplicate hand-back, remove, counts`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         let isEmpty = s.isEmpty
         #expect(isEmpty)
         let first = s.insert(10)
@@ -110,7 +116,7 @@ struct `Set.Ordered Core Tests` {
 
     @Test
     func `iteration is insertion-ordered across growth and removal`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 2)
+        var s = Set<Int>.Ordered(minimumCapacity: 2)
         var i = 0
         while i < 12 {
             s.insert(i)
@@ -124,7 +130,7 @@ struct `Set.Ordered Core Tests` {
 
     @Test
     func `removeAll empties; reuse works; direct clone detaches`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         s.insert(1)
         s.insert(2)
         var c = s.clone()
@@ -146,10 +152,14 @@ struct `Set.Ordered Core Tests` {
 
 @Suite(.serialized)
 struct `Set.Ordered Order Tests` {
+    @Suite struct Unit {}
+    @Suite struct `Edge Case` {}
+    @Suite struct Integration {}
+
 
     @Test
     func `positional subscript reads insertion order, both columns`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         s.insert(10)
         s.insert(20)
         s.insert(30)
@@ -160,7 +170,7 @@ struct `Set.Ordered Order Tests` {
         #expect(b == 20)
         #expect(c == 30)
 
-        var t = CoWOrdered<Int>(minimumCapacity: 4)
+        var t = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         t.insert(7)
         t.insert(8)
         let x = t[0]
@@ -171,7 +181,7 @@ struct `Set.Ordered Order Tests` {
 
     @Test
     func `index(of:) returns the insertion position; nil for absent members`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         s.insert(10)
         s.insert(20)
         s.insert(30)
@@ -182,7 +192,7 @@ struct `Set.Ordered Order Tests` {
         #expect(i30 == 2)
         #expect(missing == nil)
 
-        var t = CoWOrdered<Int>(minimumCapacity: 4)
+        var t = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         t.insert(5)
         t.insert(6)
         let i6 = t.index(of: 6)
@@ -193,7 +203,7 @@ struct `Set.Ordered Order Tests` {
 
     @Test
     func `removal shifts later members down; insertion order is preserved`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         s.insert(1)
         s.insert(2)
         s.insert(3)
@@ -211,7 +221,7 @@ struct `Set.Ordered Order Tests` {
 
     @Test
     func `re-insertion goes to the end`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         s.insert(1)
         s.insert(2)
         s.insert(3)
@@ -226,7 +236,7 @@ struct `Set.Ordered Order Tests` {
 
     @Test
     func `first and last track the insertion boundary; nil when empty`() {
-        var s = MoveOrdered<Int>(minimumCapacity: 4)
+        var s = Set<Int>.Ordered(minimumCapacity: 4)
         let emptyFirst = s.first
         let emptyLast = s.last
         #expect(emptyFirst == nil)
@@ -251,10 +261,14 @@ struct `Set.Ordered Order Tests` {
 
 @Suite(.serialized)
 struct `Set.Ordered CoW Tests` {
+    @Suite struct Unit {}
+    @Suite struct `Edge Case` {}
+    @Suite struct Integration {}
+
 
     @Test
     func `copies share until mutation; inserts detach through the box`() {
-        var a = CoWOrdered<Int>(minimumCapacity: 4)
+        var a = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         a.insert(1)
         let b = a  // S5: Set.Ordered is Copyable because S is
         a.insert(2)  // withUnique(consuming:) detaches first
@@ -270,7 +284,7 @@ struct `Set.Ordered CoW Tests` {
 
     @Test
     func `ordered reads never detach; removal detaches; generic clone detaches`() {
-        var a = CoWOrdered<Int>(minimumCapacity: 4)
+        var a = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         a.insert(1)
         a.insert(2)
         let b = a
@@ -298,7 +312,7 @@ struct `Set.Ordered CoW Tests` {
 
     @Test
     func `removeAll detaches to a fresh box; the sibling is untouched`() {
-        var a = CoWOrdered<Int>(minimumCapacity: 4)
+        var a = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         a.insert(1)
         let b = a
         a.removeAll()
@@ -310,13 +324,13 @@ struct `Set.Ordered CoW Tests` {
 
     @Test
     func `equality and hashing are order-sensitive (the S5 carriers)`() {
-        var a = CoWOrdered<Int>(minimumCapacity: 4)
+        var a = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         a.insert(1)
         a.insert(2)
-        var b = CoWOrdered<Int>(minimumCapacity: 4)
+        var b = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         b.insert(1)
         b.insert(2)
-        var c = CoWOrdered<Int>(minimumCapacity: 4)
+        var c = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 4)
         c.insert(2)
         c.insert(1)
         #expect(a == b)
@@ -331,12 +345,16 @@ struct `Set.Ordered CoW Tests` {
 
 @Suite(.serialized)
 struct `Set.Ordered Teardown Tests` {
+    @Suite struct Unit {}
+    @Suite struct `Edge Case` {}
+    @Suite struct Integration {}
+
 
     @Test
     func `move-only members flow through and tear down exactly once`() {
         OrderedProbe.reset()
         do {
-            var s = MoveOrdered<OrderedItem>(minimumCapacity: 4)
+            var s = Set<OrderedItem>.Ordered(minimumCapacity: 4)
             s.insert(OrderedItem(1))
             s.insert(OrderedItem(2))
             let has = s.contains(OrderedItem(2))
@@ -357,7 +375,7 @@ struct `Set.Ordered Teardown Tests` {
     func `positional reads borrow move-only members in place`() {
         OrderedProbe.reset()
         do {
-            var s = MoveOrdered<OrderedItem>(minimumCapacity: 4)
+            var s = Set<OrderedItem>.Ordered(minimumCapacity: 4)
             s.insert(OrderedItem(7))
             s.insert(OrderedItem(8))
             let id0 = s[0].id
@@ -405,6 +423,9 @@ extension OrderedItem: Hash.`Protocol` {
 private enum OrderedProbe {}
 
 extension OrderedProbe {
+    // SAFETY: allocated once at first access, mutated only through `reset()` /
+    // `recordDestroy(_:)` on the single-threaded test-runner path — this is a
+    // test-fixture deinit tally, never touched concurrently.
     nonisolated(unsafe) static var _destroyed: [Int] = []
     static func reset() { unsafe _destroyed = [] }
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }
@@ -430,6 +451,9 @@ extension OrderedItem2: Hash.`Protocol` {
 private enum OrderedProbe2 {}
 
 extension OrderedProbe2 {
+    // SAFETY: allocated once at first access, mutated only through `reset()` /
+    // `recordDestroy(_:)` on the single-threaded test-runner path — this is a
+    // test-fixture deinit tally, never touched concurrently.
     nonisolated(unsafe) static var _destroyed: [Int] = []
     static func reset() { unsafe _destroyed = [] }
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }
@@ -440,12 +464,16 @@ extension OrderedProbe2 {
 
 @Suite
 struct `Set.Ordered Sendable Tests` {
+    @Suite struct Unit {}
+    @Suite struct `Edge Case` {}
+    @Suite struct Integration {}
+
 
     @Test
     func `sendable composes through both columns`() {
-        let a = MoveOrdered<Int>(minimumCapacity: 1)
+        let a = Set<Int>.Ordered(minimumCapacity: 1)
         requireSendable(a)
-        let b = CoWOrdered<Int>(minimumCapacity: 1)
+        let b = __Set<Ownership.Shared<Int, OrderedColumn<Int>>>.Ordered(minimumCapacity: 1)
         requireSendable(b)
         #expect(Bool(true))
     }

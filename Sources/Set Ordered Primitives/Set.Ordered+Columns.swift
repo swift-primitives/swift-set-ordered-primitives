@@ -94,6 +94,10 @@ extension __SetOrdered where S: ~Copyable {
     @inlinable
     public func index<E: Hash.Key & ~Copyable>(of element: borrowing E) -> Index<E>?
     where S == Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear> {
+        // swift-linter:disable:next raw value access
+        // REASON: this IS `Set.Ordered`'s own typed-conversion boundary — the
+        // order-facing `index(of:)` surface's entire purpose is to expose the
+        // column's raw `.position(of:)` as `Index<E>`.
         store.position(of: element)
     }
 
@@ -104,6 +108,10 @@ extension __SetOrdered where S: ~Copyable {
     @inlinable
     public func index<E: Hash.Key & ~Copyable>(of element: borrowing E) -> Index<E>?
     where S == Ownership.Shared<E, Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear>> {
+        // swift-linter:disable:next raw value access
+        // REASON: this IS `Set.Ordered`'s own typed-conversion boundary — the
+        // order-facing `index(of:)` surface's entire purpose is to expose the
+        // column's raw `.position(of:)` as `Index<E>`.
         store.withColumn { $0.position(of: element) }
     }
 }

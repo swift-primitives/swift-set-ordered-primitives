@@ -87,7 +87,9 @@ public struct __SetOrdered<S: ~Copyable>: ~Copyable {
     public init(store: consuming S) {
         self.store = store
     }
+}
 
+extension __SetOrdered where S: ~Copyable {
     /// Consumes the ordered set, yielding its storage column.
     @inlinable
     public consuming func take() -> S {
